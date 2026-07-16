@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+
+<script>
+(function(){
+  var key = "scrollpos_" + location.pathname;
+  var saved = sessionStorage.getItem(key);
+  if (saved) {
+    window.addEventListener("load", function(){
+      setTimeout(function(){ window.scrollTo(0, parseInt(saved, 10)); }, 60);
+    });
+  }
+  window.addEventListener("scroll", function(){
+    sessionStorage.setItem(key, window.scrollY);
+  }, { passive: true });
+})();
+</script>
+</head>
+<body>
+<x-dc>
+
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    @keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+    html, body { margin:0; background:#161616; }
+  </style>
+</helmet>
+
+<div style="font-family:'Barlow',Helvetica,Arial,sans-serif; background:#161616; color:#eceae6; width:100%; min-height:100vh; overflow-x:hidden;" data-screen-label="Hjem">
+
+  <!-- ============ HEADER ============ -->
+  <header style="position:sticky; top:0; z-index:50; background:rgba(20,20,20,0.92); backdrop-filter:blur(6px); border-bottom:1px solid rgba(255,255,255,0.08); padding:18px 40px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:24px;">
+      <div style="display:flex; align-items:center; justify-content:flex-start; gap:14px; flex:1;">
+        <a href="index.html"><img src="assets/oslo-maskin-logo.png" alt="Oslo Maskin AS logo" style="height:52px; width:auto; display:block; cursor:pointer;" /></a>
+        <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+          <span style="color:#b84f0c; font-size:15px; font-weight:700; margin-left:auto; padding-right:10px;">{{ t.navHome }}</span>
+        </sc-if>
+      </div>
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+        <nav style="display:flex; align-items:center; gap:32px; flex-shrink:0;">
+          <a href="index.html" style="color:#b84f0c; text-decoration:none; font-size:16px; font-weight:600; letter-spacing:0.02em; white-space:nowrap;">{{ t.navHome }}</a>
+          <a href="til-salgs.html" style="color:#c9c7c2; text-decoration:none; font-size:16px; font-weight:600; letter-spacing:0.02em; white-space:nowrap;">{{ t.navForSale }}</a>
+          <a href="sist-solgt.html" style="color:#c9c7c2; text-decoration:none; font-size:16px; font-weight:600; letter-spacing:0.02em; white-space:nowrap;">{{ t.navSold }}</a>
+          <a href="om-oss.html" style="color:#c9c7c2; text-decoration:none; font-size:16px; font-weight:600; letter-spacing:0.02em; white-space:nowrap;">{{ t.navAbout }}</a>
+          <a href="kontakt.html" style="color:#c9c7c2; text-decoration:none; font-size:16px; font-weight:600; letter-spacing:0.02em; white-space:nowrap;">{{ t.navContact }}</a>
+        </nav>
+        <div style="display:flex; align-items:center; gap:16px; flex-shrink:0;">
+          <div style="position:relative;">
+            <button onclick="{{ toggleLangMenu }}" style="display:flex; align-items:center; gap:8px; background:#1e1f21; border:1px solid rgba(255,255,255,0.14); border-radius:2px; padding:10px 14px; color:#eceae6; font-size:13px; font-weight:700; letter-spacing:0.04em; cursor:pointer; text-transform:uppercase;">
+              {{ lang }}
+              <span style="font-size:10px; color:#8a8884;">▼</span>
+            </button>
+            <sc-if value="{{ langMenuOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; top:calc(100% + 6px); right:0; background:#1e1f21; border:1px solid rgba(255,255,255,0.14); border-radius:4px; box-shadow:0 12px 30px rgba(0,0,0,0.4); min-width:160px; overflow:hidden; z-index:60;">
+                <sc-for list="{{ langOptions }}" as="opt" hint-placeholder-count="9">
+                  <button onclick="{{ opt.onSelect }}" style="display:block; width:100%; text-align:left; background:transparent; border:none; padding:10px 16px; font-size:13px; font-weight:600; cursor:pointer; color:#c9c7c2;" style-hover="background:#232426; color:#eceae6;">{{ opt.name }}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <button onclick="{{ toggleEditMode }}" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:#c9c7c2; padding:11px 18px; border-radius:2px; font-weight:700; font-size:14px; cursor:pointer; white-space:nowrap;">✎ Rediger</button>
+          <a href="tel:+4792502024" style="display:flex; align-items:center; gap:10px; background:#b84f0c; color:#eceae6; padding:12px 22px; border-radius:2px; text-decoration:none; font-weight:700; font-size:15px; white-space:nowrap; flex-shrink:0;">
+            +47 925 02 024
+          </a>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <button onclick="{{ toggleMobileMenu }}" aria-label="Meny" style="background:transparent; border:1px solid rgba(255,255,255,0.2); border-radius:2px; width:46px; height:46px; display:flex; align-items:center; justify-content:center; color:#eceae6; font-size:22px; cursor:pointer; flex-shrink:0;">{{ mobileMenuIcon }}</button>
+      </sc-if>
+    </div>
+    <sc-if value="{{ mobileMenuOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex; flex-direction:column; gap:6px; padding-top:20px;">
+        <a href="index.html" style="color:#b84f0c; text-decoration:none; font-size:18px; font-weight:600; padding:10px 0;">{{ t.navHome }}</a>
+        <a href="til-salgs.html" style="color:#c9c7c2; text-decoration:none; font-size:18px; font-weight:600; padding:10px 0;">{{ t.navForSale }}</a>
+        <a href="sist-solgt.html" style="color:#c9c7c2; text-decoration:none; font-size:18px; font-weight:600; padding:10px 0;">{{ t.navSold }}</a>
+        <a href="om-oss.html" style="color:#c9c7c2; text-decoration:none; font-size:18px; font-weight:600; padding:10px 0;">{{ t.navAbout }}</a>
+        <a href="kontakt.html" style="color:#c9c7c2; text-decoration:none; font-size:18px; font-weight:600; padding:10px 0;">{{ t.navContact }}</a>
+        <div style="height:1px; background:rgba(255,255,255,0.1); margin:8px 0;"></div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <sc-for list="{{ langOptions }}" as="opt" hint-placeholder-count="9">
+            <button onclick="{{ opt.onSelect }}" style="background:#1e1f21; border:1px solid rgba(255,255,255,0.14); border-radius:2px; padding:8px 12px; color:#c9c7c2; font-size:13px; font-weight:700; cursor:pointer;">{{ opt.name }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex; gap:12px; margin-top:14px; flex-wrap:wrap;">
+          <button onclick="{{ toggleEditMode }}" style="background:transparent; border:1px solid rgba(255,255,255,0.2); color:#c9c7c2; padding:12px 18px; border-radius:2px; font-weight:700; font-size:14px; cursor:pointer;">✎ Rediger</button>
+          <a href="tel:+4792502024" style="display:flex; align-items:center; gap:10px; background:#b84f0c; color:#eceae6; padding:12px 22px; border-radius:2px; text-decoration:none; font-weight:700; font-size:15px;">+47 925 02 024</a>
+        </div>
+      </div>
+    </sc-if>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section id="hjem" style="position:relative; min-height:640px; display:flex; align-items:center; justify-content:center; padding:0 24px; background:linear-gradient(rgba(15,15,15,0.6), rgba(15,15,15,0.68)), url('assets/hjem-hero-bg.jpg') center/cover no-repeat; border-bottom:6px solid #b84f0c; overflow:hidden;">
+    <div style="position:absolute; inset:0; background:repeating-linear-gradient(115deg, rgba(255,255,255,0.025) 0px, rgba(255,255,255,0.025) 2px, transparent 2px, transparent 34px); pointer-events:none;"></div>
+    <div style="position:relative; display:flex; flex-direction:{{ heroDirection }}; align-items:center; gap:32px; max-width:1000px; width:100%;">
+    <div style="flex:0 1 560px; min-width:0; width:100%; padding:{{ heroPad }}; animation:fadeUp 0.7s ease both; text-align:{{ heroTextAlign }};">
+      <sc-if value="{{ editMode }}" hint-placeholder-val="{{ false }}">
+        <input value="{{ heroTitleVal }}" oninput="{{ setHeroTitle }}" style="display:block; width:100%; box-sizing:border-box; font-family:'Barlow Condensed'; font-weight:800; font-size:24px; line-height:1.1; margin:0 0 14px 0; color:#f7f5f1; text-transform:uppercase; letter-spacing:0.01em; background:#232426; border:1px solid #b84f0c; border-radius:4px; padding:10px;" />
+        <textarea rows="3" value="{{ heroP1Val }}" oninput="{{ setHeroP1 }}" style="display:block; width:100%; max-width:580px; box-sizing:border-box; font-size:15px; line-height:1.5; color:#bdbbb6; background:#232426; border:1px solid #b84f0c; border-radius:4px; padding:10px; margin:0 0 14px 0; font-family:inherit; resize:vertical;"></textarea>
+        <textarea rows="3" value="{{ heroP2Val }}" oninput="{{ setHeroP2 }}" style="display:block; width:100%; max-width:580px; box-sizing:border-box; font-size:15px; line-height:1.5; color:#bdbbb6; background:#232426; border:1px solid #b84f0c; border-radius:4px; padding:10px; margin:0 0 40px 0; font-family:inherit; resize:vertical;"></textarea>
+      </sc-if>
+      <sc-if value="{{ viewMode }}" hint-placeholder-val="{{ true }}">
+        <h1 style="font-family:'Barlow Condensed'; font-weight:800; font-size:38px; line-height:1.08; margin:0 0 22px 0; color:#f7f5f1; text-transform:uppercase; letter-spacing:0.01em; text-shadow:0 2px 12px rgba(0,0,0,0.7);">{{ heroTitleVal }}</h1>
+        <p style="font-size:18px; line-height:1.65; color:#f0eeea; margin:0 0 20px 0; max-width:580px; text-shadow:0 2px 8px rgba(0,0,0,0.7);">{{ heroP1Val }}</p>
+        <p style="font-size:18px; line-height:1.65; color:#f0eeea; margin:0 0 40px 0; max-width:580px; text-shadow:0 2px 8px rgba(0,0,0,0.7);">{{ heroP2Val }}</p>
+      </sc-if>
+      <div style="display:flex; gap:18px; flex-wrap:wrap; justify-content:{{ heroBtnAlign }};">
+        <a href="til-salgs.html" style="background:#b84f0c; color:#eceae6; padding:17px 34px; border-radius:2px; text-decoration:none; font-weight:700; font-size:16px; letter-spacing:0.02em; white-space:nowrap;">{{ t.ctaForSale }}</a>
+        <a href="mailto:info@oslomaskin.com" style="background:#b84f0c; color:#eceae6; padding:17px 28px; border-radius:2px; text-decoration:none; font-weight:700; font-size:16px; letter-spacing:0.02em; white-space:nowrap;">{{ t.ctaEmail }}</a>
+        <a href="https://wa.me/4792502024" target="_blank" rel="noopener" style="background:#b84f0c; color:#eceae6; padding:17px 34px; border-radius:2px; text-decoration:none; font-weight:700; font-size:16px; letter-spacing:0.02em; white-space:nowrap;">{{ t.ctaWhatsapp }}</a>
+      </div>
+    </div>
+    <div style="position:relative; flex:0 0 auto; width:{{ logoColWidth }}; max-width:{{ logoMaxWidth }}; display:flex; flex-direction:column; align-items:center; gap:24px; padding:24px 0 {{ heroLogoPadBottom }} 0; box-sizing:border-box;">
+      <img src="assets/oslo-maskin-logo-full.png" alt="Oslo Maskin AS" style="max-width:60%; height:auto;" />
+      <div style="background:#c9c7c2; border-radius:8px; padding:10px; width:100%; max-width:210px; box-sizing:border-box; box-shadow:0 12px 32px rgba(0,0,0,0.35); border-top:4px solid #b84f0c;">
+        <img src="assets/gaselle-badge-2025-graybg.png" alt="Oslo Maskin AS kåret til Gaselle-bedrift 2025" style="width:100%; height:auto; display:block; border-radius:2px;" />
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <!-- ============ INTRO ============ -->
+  <section style="padding:110px 56px; max-width:1120px; margin:0 auto; text-align:center; animation:fadeUp linear both; animation-timeline:view(); animation-range:entry 0% cover 30%;">
+    <sc-if value="{{ editMode }}" hint-placeholder-val="{{ false }}">
+      <input value="{{ introTitleVal }}" oninput="{{ setIntroTitle }}" style="display:block; width:100%; max-width:820px; margin:0 auto 14px auto; box-sizing:border-box; font-family:'Barlow Condensed'; font-weight:700; font-size:28px; color:#f4f2ee; text-transform:uppercase; background:#232426; border:1px solid #b84f0c; border-radius:4px; padding:10px; text-align:center;" />
+      <textarea rows="4" value="{{ introP1Val }}" oninput="{{ setIntroP1 }}" style="display:block; width:100%; max-width:820px; margin:0 auto 14px auto; box-sizing:border-box; font-size:16px; line-height:1.6; color:#b7b5b0; background:#232426; border:1px solid #b84f0c; border-radius:4px; padding:10px; font-family:inherit; resize:vertical; text-align:left;"></textarea>
+      <textarea rows="4" value="{{ introP2Val }}" oninput="{{ setIntroP2 }}" style="display:block; width:100%; max-width:820px; margin:0 auto; box-sizing:border-box; font-size:16px; line-height:1.6; color:#b7b5b0; background:#232426; border:1px solid #b84f0c; border-radius:4px; padding:10px; font-family:inherit; resize:vertical; text-align:left;"></textarea>
+    </sc-if>
+    <sc-if value="{{ viewMode }}" hint-placeholder-val="{{ true }}">
+      <h2 style="font-family:'Barlow Condensed'; font-weight:700; font-size:40px; color:#f4f2ee; margin:0 0 26px 0; text-transform:uppercase; letter-spacing:0.01em;">{{ introTitleVal }}</h2>
+      <p style="font-size:18px; line-height:1.75; color:#b7b5b0; margin:0 auto 20px auto; max-width:820px;">{{ introP1Val }}</p>
+      <p style="font-size:18px; line-height:1.75; color:#b7b5b0; margin:0 auto; max-width:820px;">{{ introP2Val }}</p>
+    </sc-if>
+  </section>
+
+  <!-- ============ MASKINTYPER GRID ============ -->
+  <section style="padding:0 56px 110px 56px; max-width:1200px; margin:0 auto; animation:fadeUp linear both; animation-timeline:view(); animation-range:entry 0% cover 30%;">
+    <div style="display:flex; align-items:center; justify-content:center; gap:22px; flex-wrap:wrap;">
+      <div style="background:#c9c7c2; border-radius:8px; width:230px; height:150px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <img src="assets/gaselle-2025-award.png" alt="Oslo Maskin AS er kåret til Gaselle-bedrift 2025 - Dagens Næringsliv" style="width:78%; height:78%; object-fit:contain;" />
+      </div>
+      <div style="background:#c9c7c2; border-radius:8px; width:230px; height:150px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <img src="assets/akershus-larebedrift-cert.png" alt="Godkjent lærebedrift - Akershus fylkeskommune" style="width:78%; height:78%; object-fit:contain;" />
+      </div>
+      <div style="background:#c9c7c2; border-radius:8px; width:230px; height:150px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <img src="assets/tess-forhandler-logo.png" alt="TESS Forhandler" style="width:78%; height:78%; object-fit:contain;" />
+      </div>
+      <div style="background:#c9c7c2; border-radius:8px; width:230px; height:150px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 20px rgba(0,0,0,0.3);">
+        <img src="assets/brage-finans-logo.png" alt="Brage Finans" style="width:78%; height:78%; object-fit:contain;" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SIST SOLGT SKILT ============ -->
+  <!-- ============ FOOTER / KONTAKT ============ -->
+  <footer id="kontakt" style="padding:100px 56px 50px 56px; background:#131313; border-top:6px solid #b84f0c;">
+    <div style="max-width:1200px; margin:0 auto;">
+      <div style="display:flex; align-items:center; flex-wrap:wrap; gap:24px; margin-bottom:50px;">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <img src="assets/oslo-maskin-logo.png" alt="Oslo Maskin AS logo" style="height:44px; width:auto;" />
+          <div style="display:flex; flex-direction:column; line-height:1.1;">
+            <span style="font-family:'Barlow Condensed'; font-weight:800; font-size:20px; color:#f4f2ee; white-space:nowrap;">OSLO MASKIN AS</span>
+            <span style="font-size:12px; color:#8a8884;">Org nr: 921 591 020</span>
+          </div>
+        </div>
+        <a href="https://www.facebook.com/people/Oslo-Maskin-AS/100057581883969/" target="_blank" rel="noopener" style="display:flex; align-items:center; gap:10px; background:#b84f0c; border:1px solid #b84f0c; padding:12px 20px; border-radius:2px; text-decoration:none; color:#eceae6; font-weight:700; font-size:14px;">
+          <span style="width:26px; height:26px; border-radius:50%; background:#1877F2; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Barlow Condensed'; font-weight:800; font-size:16px; flex-shrink:0;">f</span>
+          {{ t.fbBtn }}
+        </a>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:40px; margin-bottom:64px;">
+        <div>
+          <h4 style="font-size:14px; letter-spacing:0.1em; color:#b84f0c; text-transform:uppercase; margin:0 0 16px 0;">{{ t.footerVisit }}</h4>
+          <p style="font-size:15px; line-height:1.7; color:#b7b5b0; margin:0;">Gardermovegen 130,<br/>2030 Nannestad, Norway</p>
+        </div>
+        <div>
+          <h4 style="font-size:14px; letter-spacing:0.1em; color:#b84f0c; text-transform:uppercase; margin:0 0 16px 0;">{{ t.footerContact }}</h4>
+          <p style="font-size:15px; line-height:1.7; color:#b7b5b0; margin:0;">+47 639 00 990<br/>+47 925 02 024<br/>info@oslomaskin.com</p>
+        </div>
+        <div>
+          <h4 style="font-size:14px; letter-spacing:0.1em; color:#b84f0c; text-transform:uppercase; margin:0 0 16px 0;">{{ t.footerHours }}</h4>
+          <p style="font-size:15px; line-height:1.7; color:#b7b5b0; margin:0; white-space:pre-line;">{{ t.footerHoursText }}</p>
+        </div>
+        <div>
+          <h4 style="font-size:14px; letter-spacing:0.1em; color:#b84f0c; text-transform:uppercase; margin:0 0 16px 0;">{{ t.footerMenu }}</h4>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <a href="index.html" style="color:#b84f0c; text-decoration:none; font-size:15px;">{{ t.navHome }}</a>
+            <a href="til-salgs.html" style="color:#b7b5b0; text-decoration:none; font-size:15px;">{{ t.navForSale }}</a>
+            <a href="sist-solgt.html" style="color:#b7b5b0; text-decoration:none; font-size:15px;">{{ t.navSold }}</a>
+            <a href="om-oss.html" style="color:#b7b5b0; text-decoration:none; font-size:15px;">{{ t.navAbout }}</a>
+            <a href="kontakt.html" style="color:#b7b5b0; text-decoration:none; font-size:15px;">{{ t.navContact }}</a>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid rgba(255,255,255,0.08); padding-top:28px; flex-wrap:wrap; gap:16px;">
+        <span style="font-size:13px; color:#77756f;">{{ t.footerCopyright }}</span>
+        <a href="#" style="font-size:13px; color:#77756f; text-decoration:none;">{{ t.footerPrivacy }}</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ============ CHAT WIDGET ============ -->
+  <sc-if value="{{ chatOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; bottom:96px; right:28px; z-index:200; width:340px; max-width:calc(100vw - 40px); background:#1e1f21; border:1px solid rgba(255,255,255,0.12); border-radius:8px; box-shadow:0 12px 40px rgba(0,0,0,0.45); overflow:hidden; display:flex; flex-direction:column; max-height:480px;">
+      <div style="background:#b84f0c; color:#eceae6; padding:16px 18px; font-weight:700; font-size:15px; display:flex; align-items:center; justify-content:space-between;">
+        <span>{{ t.chatTitle }}</span>
+        <button onclick="{{ toggleChat }}" style="background:transparent; border:none; color:#eceae6; font-size:18px; font-weight:700; cursor:pointer; line-height:1;">×</button>
+      </div>
+      <div style="padding:16px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:10px; background:#161616;">
+        <div style="align-self:flex-start; background:#2b2c2e; color:#eceae6; padding:10px 14px; border-radius:10px; font-size:14px; max-width:85%; line-height:1.5;">{{ t.chatGreeting }}</div>
+        <sc-for list="{{ chatLog }}" as="msg" hint-placeholder-count="0">
+          <div style="align-self:flex-start; background:#2b2c2e; color:#eceae6; padding:10px 14px; border-radius:10px; font-size:14px; max-width:85%; line-height:1.5;">{{ msg.text }}</div>
+        </sc-for>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:4px;">
+          <button onclick="{{ onQuick1 }}" style="background:transparent; border:1px solid rgba(217,96,15,0.45); color:#b84f0c; padding:7px 12px; border-radius:14px; font-size:12px; font-weight:600; cursor:pointer;">{{ t.chatQ1 }}</button>
+          <button onclick="{{ onQuick2 }}" style="background:transparent; border:1px solid rgba(217,96,15,0.45); color:#b84f0c; padding:7px 12px; border-radius:14px; font-size:12px; font-weight:600; cursor:pointer;">{{ t.chatQ2 }}</button>
+          <button onclick="{{ onQuick3 }}" style="background:transparent; border:1px solid rgba(217,96,15,0.45); color:#b84f0c; padding:7px 12px; border-radius:14px; font-size:12px; font-weight:600; cursor:pointer;">{{ t.chatQ3 }}</button>
+          <button onclick="{{ onQuick4 }}" style="background:transparent; border:1px solid rgba(217,96,15,0.45); color:#b84f0c; padding:7px 12px; border-radius:14px; font-size:12px; font-weight:600; cursor:pointer;">{{ t.chatQ4 }}</button>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; padding:12px; border-top:1px solid rgba(255,255,255,0.08); background:#1e1f21;">
+        <input value="{{ chatInput }}" oninput="{{ onChatInput }}" onkeydown="{{ onChatKeyDown }}" placeholder="{{ t.chatPlaceholder }}" style="flex:1; background:#232426; border:1px solid rgba(255,255,255,0.12); border-radius:4px; padding:10px 12px; color:#eceae6; font-size:14px; outline:none;" />
+        <button onclick="{{ sendChat }}" style="background:#b84f0c; color:#eceae6; border:none; padding:10px 16px; border-radius:4px; font-weight:700; font-size:14px; cursor:pointer;">{{ t.chatSend }}</button>
+      </div>
+    </div>
+  </sc-if>
+  <button onclick="{{ toggleChat }}" style="position:fixed; bottom:28px; right:28px; z-index:200; width:60px; height:60px; border-radius:50%; background:rgba(217,96,15,0.12); border:2px solid #b84f0c; box-shadow:0 8px 24px rgba(0,0,0,0.35); backdrop-filter:blur(6px); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:26px;">💬</button>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">const TRANSLATIONS = {
+  no: {
+    langName: "Norsk",
+    heroTitle: "Kjøp og salg av brukte anleggsmaskiner og lastebiler",
+    heroP1: "Oslo Maskin AS spesialiserer seg på kjøp, salg og eksport av brukte anleggsmaskiner, lastebiler og spesialutstyr. Med lang erfaring, raskt oppgjør og effektiv logistikk tilbyr vi en trygg, profesjonell og forutsigbar handel til kunder i Norge og over hele verden.",
+    heroP2: "Har du en anleggsmaskin eller lastebil du ønsker å selge? Kontakt oss for en rask, ryddig og risikofri handel. Vi tilbyr rask vurdering, oppgjør samme dag og henter maskiner over hele Norge.",
+    navHome: "Hjem", navForSale: "Til salgs", navSold: "Sist solgt", navAbout: "Om oss", navContact: "Kontakt",
+    heroBadge: "NASJONALT & INTERNASJONALT",
+    heroTitle: "Alt innen kjøp og salg av lastebiler og anleggsmaskiner",
+    heroDesc: "Profesjonell leverandør av brukte anleggsmaskiner, lastebiler og spesialutstyr til bygg- og anleggsbransjen — ryddig, raskt og risikofritt.",
+    ctaForSale: "Til salgs", ctaContact: "Kontakt oss", ctaEmail: "E-post", emailAppOption: "E-postapp",
+    introTitle: "Anleggsmaskiner og utstyr til ulike bransjer",
+    introP1: "Oslo Maskin AS er en profesjonell leverandør av kjøp og salg av brukte anleggsmaskiner, lastebiler og spesialutstyr til bygg- og anleggsbransjen. Vi opererer både nasjonalt og internasjonalt, og leverer effektive og ryddige handelsprosesser med fokus på kvalitet og pålitelighet.",
+    introP2: "Vårt utvalg inkluderer blant annet gravemaskiner, hjullastere, dumpere, valser, veihøvler, teleskoplastere, borerigger, knusere, gaffeltrucker og lastebiler — tilpasset kundens behov med høy fagkompetanse og rask oppfølging.",
+    forSaleTitle: "Finn de nyeste produktene", forSaleSub: "Ta en titt på noen av produktene våre, og finn det du leter etter.", readMore: "Les mer",
+    sellTitle: "Har du lastebiler, anleggsmaskiner eller utstyr som skal selges?", sellSub: "Ta kontakt for en hyggelig prat.",
+    ctaWhatsapp: "Kontakt oss på WhatsApp", ctaEmailBtn: "Send e-post",
+    fbTitle: "Få med deg de nyeste tilbudene", fbSub: "Følg oss på Facebook og se våre nyeste tilbud og kampanjer.", fbBtn: "Følg oss på Facebook",
+    qualityTitle: "Høy kvalitet og god kundeservice", qualitySub: "Oppkjøp av maskiner — ryddig, raskt og risikofritt.",
+    qualityP: "Vi samarbeider med etablerte produsenter og leverandører globalt og stiller høye krav til kvalitet. Alle transaksjoner gjennomføres på en strukturert, profesjonell og trygg måte, med klare avtalevilkår og levering til avtalt tid og pris.",
+    soldBadge: "SIST SOLGT", soldTitle: "Se maskiner vi nylig har solgt", soldBtn: "Gå til Sist solgt →",
+    footerVisit: "Besøk oss", footerContact: "Kontakt oss", footerHours: "Åpningstider",
+    footerHoursText: "Mandag til fredag: 08:00–16:00\nLørdag og søndag etter avtale",
+    footerMenu: "Meny", footerCopyright: "© 2026 Oslo Maskin AS. Alle rettigheter reservert.", footerPrivacy: "Personvern",
+    chatTitle: "Chat med Oslo Maskin AS", chatGreeting: "Hei! Spør meg om åpningstider, kontakt, beliggenhet eller maskiner. 👋",
+    chatPlaceholder: "Skriv en melding...", chatSend: "Send",
+    chatQ1: "Åpningstider", chatQ2: "Kontaktinfo", chatQ3: "Hvor holder dere til?", chatQ4: "Selge maskin?",
+    chatA1: "Vi har åpent mandag–fredag 08:00–16:00. Lørdag og søndag etter avtale.",
+    chatA2: "Du når oss på +47 639 00 990 / +47 925 02 024 eller info@oslomaskin.com.",
+    chatA3: "Vi holder til på Gardermovegen 130, 2030 Nannestad — 7 minutter fra Oslo Lufthavn Gardermoen.",
+    chatA4: "Vi kjøper og tar gjerne innbytte i alt av anleggsmaskiner og lastebiler — ta kontakt på WhatsApp så avtaler vi resten.",
+    chatFallback: "Takk for meldingen! For raskeste svar, ta kontakt direkte på WhatsApp eller telefon +47 925 02 024."
+  },
+  en: {
+    langName: "English",
+    heroTitle: "Buying and selling used construction machinery and trucks",
+    heroP1: "Oslo Maskin AS specializes in buying, selling and exporting used construction machinery, trucks and specialist equipment. With extensive experience, fast settlement and efficient logistics, we offer safe, professional and predictable trade to customers in Norway and around the world.",
+    heroP2: "Do you have a construction machine or truck you want to sell? Contact us for a fast, organized and risk-free trade. We offer quick evaluation, same-day settlement and pickup anywhere in Norway.",
+    navHome: "Home", navForSale: "For Sale", navSold: "Recently Sold", navAbout: "About Us", navContact: "Contact",
+    heroBadge: "NATIONAL & INTERNATIONAL",
+    heroTitle: "Everything in buying and selling trucks and construction machinery",
+    heroDesc: "Professional supplier of used construction machinery, trucks and specialist equipment for the construction industry — organized, fast and risk-free.",
+    ctaForSale: "For Sale", ctaContact: "Contact Us", ctaEmail: "Email", emailAppOption: "Email app",
+    introTitle: "Construction machinery and equipment for various industries",
+    introP1: "Oslo Maskin AS is a professional supplier of buying and selling used construction machinery, trucks and specialist equipment for the construction industry. We operate both nationally and internationally, delivering efficient and organized trading processes with a focus on quality and reliability.",
+    introP2: "Our range includes excavators, wheel loaders, dumpers, rollers, graders, telehandlers, drill rigs, crushers, forklifts and trucks — tailored to customer needs with high expertise and fast follow-up.",
+    forSaleTitle: "Find the newest products", forSaleSub: "Take a look at some of our products and find what you're looking for.", readMore: "Read more",
+    sellTitle: "Do you have trucks, construction machinery or equipment to sell?", sellSub: "Get in touch for a friendly chat.",
+    ctaWhatsapp: "Contact us on WhatsApp", ctaEmailBtn: "Send email",
+    fbTitle: "Get the latest offers", fbSub: "Follow us on Facebook and see our latest offers and promotions.", fbBtn: "Follow us on Facebook",
+    qualityTitle: "High quality and great customer service", qualitySub: "Machine acquisition — organized, fast and risk-free.",
+    qualityP: "We work with established manufacturers and suppliers globally and set high quality standards. All transactions are carried out in a structured, professional and safe manner, with clear terms and delivery on agreed time and price.",
+    soldBadge: "RECENTLY SOLD", soldTitle: "See machines we've recently sold", soldBtn: "Go to Recently Sold →",
+    footerVisit: "Visit Us", footerContact: "Contact Us", footerHours: "Opening Hours",
+    footerHoursText: "Monday to Friday: 08:00–16:00\nSaturday and Sunday by appointment",
+    footerMenu: "Menu", footerCopyright: "© 2026 Oslo Maskin AS. All rights reserved.", footerPrivacy: "Privacy",
+    chatTitle: "Chat with Oslo Maskin", chatGreeting: "Hi! Ask me about opening hours, contact info, location or machines. 👋",
+    chatPlaceholder: "Type a message...", chatSend: "Send",
+    chatQ1: "Opening hours", chatQ2: "Contact info", chatQ3: "Where are you located?", chatQ4: "Sell a machine?",
+    chatA1: "We're open Monday–Friday 08:00–16:00. Saturday and Sunday by appointment.",
+    chatA2: "Reach us at +47 639 00 990 / +47 925 02 024 or info@oslomaskin.com.",
+    chatA3: "We're located at Gardermovegen 130, 2030 Nannestad — 7 minutes from Oslo Airport Gardermoen.",
+    chatA4: "We buy and gladly take trade-ins on any construction machinery or trucks — reach out on WhatsApp and we'll arrange the rest.",
+    chatFallback: "Thanks for your message! For the fastest reply, contact us directly on WhatsApp or phone +47 925 02 024."
+  },
+  de: {
+    langName: "Deutsch",
+    heroTitle: "Kauf und Verkauf von gebrauchten Baumaschinen und Lastwagen",
+    heroP1: "Oslo Maskin AS ist spezialisiert auf den Kauf, Verkauf und Export von gebrauchten Baumaschinen, Lastwagen und Spezialausrüstung. Mit langjähriger Erfahrung, schneller Abwicklung und effizienter Logistik bieten wir Kunden in Norwegen und weltweit einen sicheren, professionellen und verlässlichen Handel.",
+    heroP2: "Haben Sie eine Baumaschine oder einen Lastwagen zu verkaufen? Kontaktieren Sie uns für einen schnellen, geordneten und risikofreien Handel. Wir bieten schnelle Bewertung, Abwicklung am selben Tag und Abholung in ganz Norwegen.",
+    navHome: "Startseite", navForSale: "Zu verkaufen", navSold: "Verkauft", navAbout: "Über uns", navContact: "Kontakt",
+    heroBadge: "NATIONAL & INTERNATIONAL",
+    heroTitle: "Alles rund um Kauf und Verkauf von Lastwagen und Baumaschinen",
+    heroDesc: "Professioneller Anbieter von gebrauchten Baumaschinen, Lastwagen und Spezialausrüstung für die Baubranche — geordnet, schnell und risikofrei.",
+    ctaForSale: "Zu verkaufen", ctaContact: "Kontaktieren Sie uns", ctaEmail: "E-Mail", emailAppOption: "E-Mail-App",
+    introTitle: "Baumaschinen und Ausrüstung für verschiedene Branchen",
+    introP1: "Oslo Maskin AS ist ein professioneller Anbieter für den Kauf und Verkauf von gebrauchten Baumaschinen, Lastwagen und Spezialausrüstung für die Baubranche. Wir sind national und international tätig und bieten effiziente, geordnete Handelsprozesse mit Fokus auf Qualität und Zuverlässigkeit.",
+    introP2: "Unser Sortiment umfasst unter anderem Bagger, Radlader, Muldenkipper, Walzen, Grader, Teleskoplader, Bohrgeräte, Brecher, Gabelstapler und Lastwagen — angepasst an die Bedürfnisse unserer Kunden mit hoher Fachkompetenz und schneller Betreuung.",
+    forSaleTitle: "Neueste Produkte entdecken", forSaleSub: "Werfen Sie einen Blick auf unsere Produkte und finden Sie, was Sie suchen.", readMore: "Mehr erfahren",
+    sellTitle: "Haben Sie Lastwagen, Baumaschinen oder Ausrüstung zu verkaufen?", sellSub: "Kontaktieren Sie uns für ein freundliches Gespräch.",
+    ctaWhatsapp: "Kontakt via WhatsApp", ctaEmailBtn: "E-Mail senden",
+    fbTitle: "Verpassen Sie keine Angebote", fbSub: "Folgen Sie uns auf Facebook für unsere neuesten Angebote und Aktionen.", fbBtn: "Auf Facebook folgen",
+    qualityTitle: "Hohe Qualität und guter Kundenservice", qualitySub: "Maschinenankauf — geordnet, schnell und risikofrei.",
+    qualityP: "Wir arbeiten mit etablierten Herstellern und Lieferanten weltweit zusammen und stellen hohe Qualitätsanforderungen. Alle Transaktionen erfolgen strukturiert, professionell und sicher, mit klaren Vertragsbedingungen und Lieferung zu vereinbarter Zeit und Preis.",
+    soldBadge: "KÜRZLICH VERKAUFT", soldTitle: "Sehen Sie kürzlich verkaufte Maschinen", soldBtn: "Zu Verkauft →",
+    footerVisit: "Besuchen Sie uns", footerContact: "Kontaktieren Sie uns", footerHours: "Öffnungszeiten",
+    footerHoursText: "Montag bis Freitag: 08:00–16:00\nSamstag und Sonntag nach Vereinbarung",
+    footerMenu: "Menü", footerCopyright: "© 2026 Oslo Maskin AS. Alle Rechte vorbehalten.", footerPrivacy: "Datenschutz",
+    chatTitle: "Chat mit Oslo Maskin", chatGreeting: "Hallo! Fragen Sie mich nach Öffnungszeiten, Kontakt, Standort oder Maschinen. 👋",
+    chatPlaceholder: "Nachricht eingeben...", chatSend: "Senden",
+    chatQ1: "Öffnungszeiten", chatQ2: "Kontaktinfo", chatQ3: "Wo befindet ihr euch?", chatQ4: "Maschine verkaufen?",
+    chatA1: "Wir haben Montag–Freitag 08:00–16:00 geöffnet. Samstag und Sonntag nach Vereinbarung.",
+    chatA2: "Erreichen Sie uns unter +47 639 00 990 / +47 925 02 024 oder info@oslomaskin.com.",
+    chatA3: "Wir befinden uns in Gardermovegen 130, 2030 Nannestad — 7 Minuten vom Flughafen Oslo Gardermoen entfernt.",
+    chatA4: "Wir kaufen und nehmen gerne Baumaschinen und Lastwagen in Zahlung — kontaktieren Sie uns über WhatsApp.",
+    chatFallback: "Danke für Ihre Nachricht! Für die schnellste Antwort kontaktieren Sie uns direkt über WhatsApp oder Telefon +47 925 02 024."
+  },
+  da: {
+    langName: "Dansk",
+    heroTitle: "Køb og salg af brugte entreprenørmaskiner og lastbiler",
+    heroP1: "Oslo Maskin AS specialiserer sig i køb, salg og eksport af brugte entreprenørmaskiner, lastbiler og specialudstyr. Med lang erfaring, hurtigt opgør og effektiv logistik tilbyder vi en tryg, professionel og forudsigelig handel til kunder i Norge og over hele verden.",
+    heroP2: "Har du en entreprenørmaskine eller lastbil, du ønsker at sælge? Kontakt os for en hurtig, ryddig og risikofri handel. Vi tilbyder hurtig vurdering, opgør samme dag og henter maskiner i hele Norge.",
+    navHome: "Hjem", navForSale: "Til salg", navSold: "Nyligt solgt", navAbout: "Om os", navContact: "Kontakt",
+    heroBadge: "NATIONALT & INTERNATIONALT",
+    heroTitle: "Alt inden for køb og salg af lastbiler og entreprenørmaskiner",
+    heroDesc: "Professionel leverandør af brugte entreprenørmaskiner, lastbiler og specialudstyr til bygge- og anlægsbranchen — ryddigt, hurtigt og risikofrit.",
+    ctaForSale: "Til salg", ctaContact: "Kontakt os", ctaEmail: "E-mail", emailAppOption: "E-mailapp",
+    introTitle: "Entreprenørmaskiner og udstyr til forskellige brancher",
+    introP1: "Oslo Maskin AS er en professionel leverandør af køb og salg af brugte entreprenørmaskiner, lastbiler og specialudstyr til bygge- og anlægsbranchen. Vi opererer både nationalt og internationalt, og leverer effektive og ryddige handelsprocesser med fokus på kvalitet og pålidelighed.",
+    introP2: "Vores sortiment inkluderer blandt andet gravemaskiner, hjullæssere, dumpere, tromler, gradere, teleskoplæssere, boreriggeri, knusere, gaffeltrucks og lastbiler — tilpasset kundens behov med høj fagkompetence og hurtig opfølgning.",
+    forSaleTitle: "Find de nyeste produkter", forSaleSub: "Kig på nogle af vores produkter, og find det du leder efter.", readMore: "Læs mere",
+    sellTitle: "Har du lastbiler, entreprenørmaskiner eller udstyr til salg?", sellSub: "Kontakt os for en hyggelig snak.",
+    ctaWhatsapp: "Kontakt os på WhatsApp", ctaEmailBtn: "Send e-mail",
+    fbTitle: "Få de nyeste tilbud", fbSub: "Følg os på Facebook og se vores nyeste tilbud og kampagner.", fbBtn: "Følg os på Facebook",
+    qualityTitle: "Høj kvalitet og god kundeservice", qualitySub: "Maskinopkøb — ryddigt, hurtigt og risikofrit.",
+    qualityP: "Vi samarbejder med etablerede producenter og leverandører globalt og stiller høje kvalitetskrav. Alle transaktioner gennemføres struktureret, professionelt og trygt, med klare aftalevilkår og levering til aftalt tid og pris.",
+    soldBadge: "NYLIGT SOLGT", soldTitle: "Se maskiner vi for nylig har solgt", soldBtn: "Gå til Nyligt solgt →",
+    footerVisit: "Besøg os", footerContact: "Kontakt os", footerHours: "Åbningstider",
+    footerHoursText: "Mandag til fredag: 08:00–16:00\nLørdag og søndag efter aftale",
+    footerMenu: "Menu", footerCopyright: "© 2026 Oslo Maskin AS. Alle rettigheder forbeholdes.", footerPrivacy: "Privatliv",
+    chatTitle: "Chat med Oslo Maskin AS", chatGreeting: "Hej! Spørg mig om åbningstider, kontakt, beliggenhed eller maskiner. 👋",
+    chatPlaceholder: "Skriv en besked...", chatSend: "Send",
+    chatQ1: "Åbningstider", chatQ2: "Kontaktinfo", chatQ3: "Hvor holder I til?", chatQ4: "Sælge maskine?",
+    chatA1: "Vi har åbent mandag–fredag 08:00–16:00. Lørdag og søndag efter aftale.",
+    chatA2: "Du kan nå os på +47 639 00 990 / +47 925 02 024 eller info@oslomaskin.com.",
+    chatA3: "Vi holder til på Gardermovegen 130, 2030 Nannestad — 7 minutter fra Oslo Lufthavn Gardermoen.",
+    chatA4: "Vi køber og tager gerne bytte i alt af entreprenørmaskiner og lastbiler — kontakt os på WhatsApp, så ordner vi resten.",
+    chatFallback: "Tak for din besked! For hurtigst svar, kontakt os direkte på WhatsApp eller telefon +47 925 02 024."
+  },
+  fr: {
+    langName: "Français",
+    heroTitle: "Achat et vente d'engins de chantier et de camions d'occasion",
+    heroP1: "Oslo Maskin AS est spécialisé dans l'achat, la vente et l'exportation d'engins de chantier, de camions et d'équipements spécialisés d'occasion. Avec une longue expérience, un règlement rapide et une logistique efficace, nous offrons un commerce sûr, professionnel et prévisible aux clients en Norvège et dans le monde entier.",
+    heroP2: "Avez-vous un engin de chantier ou un camion à vendre ? Contactez-nous pour une transaction rapide, organisée et sans risque. Nous proposons une évaluation rapide, un règlement le jour même et un enlèvement partout en Norvège.",
+    navHome: "Accueil", navForSale: "À vendre", navSold: "Récemment vendu", navAbout: "À propos", navContact: "Contact",
+    heroBadge: "NATIONAL & INTERNATIONAL",
+    heroTitle: "Tout pour l'achat et la vente de camions et d'engins de chantier",
+    heroDesc: "Fournisseur professionnel d'engins de chantier, de camions et d'équipements spécialisés d'occasion pour le secteur du BTP — organisé, rapide et sans risque.",
+    ctaForSale: "À vendre", ctaContact: "Contactez-nous", ctaEmail: "E-mail", emailAppOption: "Appli e-mail",
+    introTitle: "Engins de chantier et équipements pour divers secteurs",
+    introP1: "Oslo Maskin AS est un fournisseur professionnel d'achat et de vente d'engins de chantier, de camions et d'équipements spécialisés d'occasion pour le secteur du BTP. Nous opérons au niveau national et international, avec des processus commerciaux efficaces axés sur la qualité et la fiabilité.",
+    introP2: "Notre gamme comprend des pelleteuses, chargeuses sur roues, tombereaux, rouleaux compresseurs, niveleuses, chariots télescopiques, foreuses, concasseurs, chariots élévateurs et camions — adaptés aux besoins des clients.",
+    forSaleTitle: "Découvrez les derniers produits", forSaleSub: "Jetez un œil à certains de nos produits et trouvez ce que vous cherchez.", readMore: "En savoir plus",
+    sellTitle: "Vous avez des camions, engins de chantier ou équipements à vendre ?", sellSub: "Contactez-nous pour une discussion amicale.",
+    ctaWhatsapp: "Contactez-nous sur WhatsApp", ctaEmailBtn: "Envoyer un e-mail",
+    fbTitle: "Ne manquez pas nos dernières offres", fbSub: "Suivez-nous sur Facebook pour nos dernières offres et promotions.", fbBtn: "Suivez-nous sur Facebook",
+    qualityTitle: "Haute qualité et excellent service client", qualitySub: "Rachat de machines — organisé, rapide et sans risque.",
+    qualityP: "Nous travaillons avec des fabricants et fournisseurs établis dans le monde entier et exigeons une grande qualité. Toutes les transactions sont réalisées de manière structurée, professionnelle et sûre, avec des conditions claires et une livraison au prix et au moment convenus.",
+    soldBadge: "RÉCEMMENT VENDU", soldTitle: "Voir les machines récemment vendues", soldBtn: "Voir les ventes récentes →",
+    footerVisit: "Nous rendre visite", footerContact: "Contactez-nous", footerHours: "Heures d'ouverture",
+    footerHoursText: "Lundi au vendredi : 08h00–16h00\nSamedi et dimanche sur rendez-vous",
+    footerMenu: "Menu", footerCopyright: "© 2026 Oslo Maskin AS. Tous droits réservés.", footerPrivacy: "Confidentialité",
+    chatTitle: "Chat avec Oslo Maskin", chatGreeting: "Bonjour ! Demandez-moi les horaires, le contact, l'emplacement ou les machines. 👋",
+    chatPlaceholder: "Écrivez un message...", chatSend: "Envoyer",
+    chatQ1: "Horaires", chatQ2: "Contact", chatQ3: "Où êtes-vous situés ?", chatQ4: "Vendre une machine ?",
+    chatA1: "Nous sommes ouverts du lundi au vendredi de 08h00 à 16h00. Samedi et dimanche sur rendez-vous.",
+    chatA2: "Contactez-nous au +47 639 00 990 / +47 925 02 024 ou info@oslomaskin.com.",
+    chatA3: "Nous sommes situés à Gardermovegen 130, 2030 Nannestad — à 7 minutes de l'aéroport d'Oslo Gardermoen.",
+    chatA4: "Nous achetons et acceptons volontiers des reprises de tout engin de chantier ou camion — contactez-nous sur WhatsApp.",
+    chatFallback: "Merci pour votre message ! Pour une réponse rapide, contactez-nous directement sur WhatsApp ou au +47 925 02 024."
+  },
+  es: {
+    langName: "Español",
+    heroTitle: "Compra y venta de maquinaria de construcción y camiones usados",
+    heroP1: "Oslo Maskin AS se especializa en la compra, venta y exportación de maquinaria de construcción, camiones y equipos especiales usados. Con amplia experiencia, liquidación rápida y logística eficiente, ofrecemos un comercio seguro, profesional y predecible a clientes en Noruega y en todo el mundo.",
+    heroP2: "¿Tienes una máquina de construcción o un camión que quieres vender? Contáctanos para una transacción rápida, organizada y sin riesgos. Ofrecemos evaluación rápida, liquidación el mismo día y recogida en toda Noruega.",
+    navHome: "Inicio", navForSale: "En venta", navSold: "Vendido recientemente", navAbout: "Sobre nosotros", navContact: "Contacto",
+    heroBadge: "NACIONAL E INTERNACIONAL",
+    heroTitle: "Todo en compra y venta de camiones y maquinaria de construcción",
+    heroDesc: "Proveedor profesional de maquinaria de construcción, camiones y equipos especiales usados para el sector de la construcción — organizado, rápido y sin riesgos.",
+    ctaForSale: "En venta", ctaContact: "Contáctanos", ctaEmail: "Correo", emailAppOption: "App de correo",
+    introTitle: "Maquinaria de construcción y equipos para diversos sectores",
+    introP1: "Oslo Maskin AS es un proveedor profesional de compra y venta de maquinaria de construcción, camiones y equipos especiales usados para el sector de la construcción. Operamos tanto a nivel nacional como internacional, ofreciendo procesos comerciales eficientes centrados en la calidad y la fiabilidad.",
+    introP2: "Nuestra gama incluye excavadoras, cargadoras de ruedas, dúmpers, rodillos, motoniveladoras, manipuladores telescópicos, perforadoras, trituradoras, carretillas elevadoras y camiones — adaptados a las necesidades del cliente.",
+    forSaleTitle: "Descubre los productos más recientes", forSaleSub: "Echa un vistazo a algunos de nuestros productos y encuentra lo que buscas.", readMore: "Leer más",
+    sellTitle: "¿Tienes camiones, maquinaria de construcción o equipos para vender?", sellSub: "Contáctanos para una charla amistosa.",
+    ctaWhatsapp: "Contáctanos por WhatsApp", ctaEmailBtn: "Enviar correo",
+    fbTitle: "No te pierdas las últimas ofertas", fbSub: "Síguenos en Facebook y consulta nuestras últimas ofertas y promociones.", fbBtn: "Síguenos en Facebook",
+    qualityTitle: "Alta calidad y excelente servicio al cliente", qualitySub: "Adquisición de maquinaria — organizado, rápido y sin riesgos.",
+    qualityP: "Trabajamos con fabricantes y proveedores consolidados a nivel mundial y exigimos altos estándares de calidad. Todas las transacciones se realizan de forma estructurada, profesional y segura, con condiciones claras y entrega en el plazo y precio acordados.",
+    soldBadge: "VENDIDO RECIENTEMENTE", soldTitle: "Ver máquinas vendidas recientemente", soldBtn: "Ver ventas recientes →",
+    footerVisit: "Visítanos", footerContact: "Contáctanos", footerHours: "Horario de atención",
+    footerHoursText: "Lunes a viernes: 08:00–16:00\nSábado y domingo con cita previa",
+    footerMenu: "Menú", footerCopyright: "© 2026 Oslo Maskin AS. Todos los derechos reservados.", footerPrivacy: "Privacidad",
+    chatTitle: "Chatea con Oslo Maskin", chatGreeting: "¡Hola! Pregúntame sobre horarios, contacto, ubicación o maquinaria. 👋",
+    chatPlaceholder: "Escribe un mensaje...", chatSend: "Enviar",
+    chatQ1: "Horario", chatQ2: "Info de contacto", chatQ3: "¿Dónde están ubicados?", chatQ4: "¿Vender una máquina?",
+    chatA1: "Abrimos de lunes a viernes de 08:00 a 16:00. Sábado y domingo con cita previa.",
+    chatA2: "Contáctanos al +47 639 00 990 / +47 925 02 024 o info@oslomaskin.com.",
+    chatA3: "Estamos ubicados en Gardermovegen 130, 2030 Nannestad — a 7 minutos del aeropuerto de Oslo Gardermoen.",
+    chatA4: "Compramos y aceptamos con gusto la parte de pago de cualquier maquinaria de construcción o camión — contáctanos por WhatsApp.",
+    chatFallback: "¡Gracias por tu mensaje! Para una respuesta más rápida, contáctanos directamente por WhatsApp o al teléfono +47 925 02 024."
+  },
+  pl: {
+    langName: "Polski",
+    heroTitle: "Kupno i sprzedaż używanych maszyn budowlanych i ciężarówek",
+    heroP1: "Oslo Maskin AS specjalizuje się w kupnie, sprzedaży i eksporcie używanych maszyn budowlanych, ciężarówek i sprzętu specjalistycznego. Dzięki wieloletniemu doświadczeniu, szybkiej płatności i sprawnej logistyce oferujemy bezpieczny, profesjonalny i przewidywalny handel klientom w Norwegii i na całym świecie.",
+    heroP2: "Masz maszynę budowlaną lub ciężarówkę do sprzedania? Skontaktuj się z nami w celu szybkiej, sprawnej i bezpiecznej transakcji. Oferujemy szybką wycenę, płatność tego samego dnia i odbiór w całej Norwegii.",
+    navHome: "Strona główna", navForSale: "Na sprzedaż", navSold: "Ostatnio sprzedane", navAbout: "O nas", navContact: "Kontakt",
+    heroBadge: "KRAJOWO I MIĘDZYNARODOWO",
+    heroTitle: "Wszystko w zakresie kupna i sprzedaży ciężarówek i maszyn budowlanych",
+    heroDesc: "Profesjonalny dostawca używanych maszyn budowlanych, ciężarówek i sprzętu specjalistycznego dla branży budowlanej — sprawnie, szybko i bezpiecznie.",
+    ctaForSale: "Na sprzedaż", ctaContact: "Skontaktuj się z nami", ctaEmail: "E-mail", emailAppOption: "Aplikacja e-mail",
+    introTitle: "Maszyny budowlane i sprzęt dla różnych branż",
+    introP1: "Oslo Maskin AS to profesjonalny dostawca w zakresie kupna i sprzedaży używanych maszyn budowlanych, ciężarówek i sprzętu specjalistycznego dla branży budowlanej. Działamy zarówno krajowo, jak i międzynarodowo, oferując sprawne procesy handlowe skoncentrowane na jakości i niezawodności.",
+    introP2: "Nasza oferta obejmuje koparki, ładowarki kołowe, wywrotki, walce, równiarki, ładowarki teleskopowe, wiertnice, kruszarki, wózki widłowe i ciężarówki — dostosowane do potrzeb klienta.",
+    forSaleTitle: "Odkryj najnowsze produkty", forSaleSub: "Zobacz nasze produkty i znajdź to, czego szukasz.", readMore: "Czytaj więcej",
+    sellTitle: "Masz ciężarówki, maszyny budowlane lub sprzęt na sprzedaż?", sellSub: "Skontaktuj się z nami na miłą rozmowę.",
+    ctaWhatsapp: "Skontaktuj się przez WhatsApp", ctaEmailBtn: "Wyślij e-mail",
+    fbTitle: "Nie przegap najnowszych ofert", fbSub: "Obserwuj nas na Facebooku i zobacz nasze najnowsze oferty i promocje.", fbBtn: "Obserwuj nas na Facebooku",
+    qualityTitle: "Wysoka jakość i doskonała obsługa klienta", qualitySub: "Skup maszyn — sprawnie, szybko i bezpiecznie.",
+    qualityP: "Współpracujemy z uznanymi producentami i dostawcami na całym świecie i stawiamy wysokie wymagania jakościowe. Wszystkie transakcje przeprowadzane są w sposób uporządkowany, profesjonalny i bezpieczny, z jasnymi warunkami umowy i dostawą w uzgodnionym czasie i cenie.",
+    soldBadge: "OSTATNIO SPRZEDANE", soldTitle: "Zobacz ostatnio sprzedane maszyny", soldBtn: "Przejdź do ostatnio sprzedanych →",
+    footerVisit: "Odwiedź nas", footerContact: "Skontaktuj się z nami", footerHours: "Godziny otwarcia",
+    footerHoursText: "Poniedziałek do piątku: 08:00–16:00\nSobota i niedziela po umówieniu",
+    footerMenu: "Menu", footerCopyright: "© 2026 Oslo Maskin AS. Wszelkie prawa zastrzeżone.", footerPrivacy: "Prywatność",
+    chatTitle: "Czat z Oslo Maskin", chatGreeting: "Cześć! Zapytaj mnie o godziny otwarcia, kontakt, lokalizację lub maszyny. 👋",
+    chatPlaceholder: "Napisz wiadomość...", chatSend: "Wyślij",
+    chatQ1: "Godziny otwarcia", chatQ2: "Dane kontaktowe", chatQ3: "Gdzie się znajdujecie?", chatQ4: "Sprzedać maszynę?",
+    chatA1: "Jesteśmy otwarci od poniedziałku do piątku 08:00–16:00. Sobota i niedziela po umówieniu.",
+    chatA2: "Skontaktuj się z nami pod +47 639 00 990 / +47 925 02 024 lub info@oslomaskin.com.",
+    chatA3: "Znajdujemy się przy Gardermovegen 130, 2030 Nannestad — 7 minut od lotniska Oslo Gardermoen.",
+    chatA4: "Kupujemy i chętnie przyjmujemy w rozliczeniu wszelkie maszyny budowlane i ciężarówki — napisz do nas na WhatsApp.",
+    chatFallback: "Dziękujemy za wiadomość! Aby otrzymać najszybszą odpowiedź, skontaktuj się bezpośrednio przez WhatsApp lub telefonicznie +47 925 02 024."
+  },
+  nl: {
+    langName: "Nederlands",
+    heroTitle: "Aan- en verkoop van gebruikte bouwmachines en vrachtwagens",
+    heroP1: "Oslo Maskin AS is gespecialiseerd in het kopen, verkopen en exporteren van gebruikte bouwmachines, vrachtwagens en gespecialiseerde apparatuur. Met jarenlange ervaring, snelle afhandeling en efficiënte logistiek bieden we klanten in Noorwegen en over de hele wereld een veilige, professionele en voorspelbare handel.",
+    heroP2: "Heb je een bouwmachine of vrachtwagen die je wilt verkopen? Neem contact met ons op voor een snelle, overzichtelijke en risicovrije handel. We bieden snelle beoordeling, afhandeling dezelfde dag en ophaling in heel Noorwegen.",
+    navHome: "Home", navForSale: "Te koop", navSold: "Recent verkocht", navAbout: "Over ons", navContact: "Contact",
+    heroBadge: "NATIONAAL & INTERNATIONAAL",
+    heroTitle: "Alles op het gebied van kopen en verkopen van vrachtwagens en bouwmachines",
+    heroDesc: "Professionele leverancier van gebruikte bouwmachines, vrachtwagens en gespecialiseerde apparatuur voor de bouwsector — overzichtelijk, snel en risicovrij.",
+    ctaForSale: "Te koop", ctaContact: "Neem contact op", ctaEmail: "E-mail", emailAppOption: "E-mailapp",
+    introTitle: "Bouwmachines en apparatuur voor diverse sectoren",
+    introP1: "Oslo Maskin AS is een professionele leverancier voor het kopen en verkopen van gebruikte bouwmachines, vrachtwagens en gespecialiseerde apparatuur voor de bouwsector. We opereren zowel nationaal als internationaal, met efficiënte en overzichtelijke handelsprocessen gericht op kwaliteit en betrouwbaarheid.",
+    introP2: "Ons assortiment omvat onder andere graafmachines, wielladers, dumpers, walsen, graders, verreikers, boorinstallaties, breekmachines, vorkheftrucks en vrachtwagens — afgestemd op de behoeften van de klant.",
+    forSaleTitle: "Ontdek de nieuwste producten", forSaleSub: "Bekijk enkele van onze producten en vind wat je zoekt.", readMore: "Lees meer",
+    sellTitle: "Heb je vrachtwagens, bouwmachines of apparatuur te koop?", sellSub: "Neem contact op voor een vriendelijk gesprek.",
+    ctaWhatsapp: "Neem contact op via WhatsApp", ctaEmailBtn: "Stuur e-mail",
+    fbTitle: "Mis de nieuwste aanbiedingen niet", fbSub: "Volg ons op Facebook voor onze nieuwste aanbiedingen en acties.", fbBtn: "Volg ons op Facebook",
+    qualityTitle: "Hoge kwaliteit en goede klantenservice", qualitySub: "Machineovername — overzichtelijk, snel en risicovrij.",
+    qualityP: "We werken samen met gevestigde fabrikanten en leveranciers wereldwijd en stellen hoge kwaliteitseisen. Alle transacties worden gestructureerd, professioneel en veilig uitgevoerd, met duidelijke voorwaarden en levering op afgesproken tijd en prijs.",
+    soldBadge: "RECENT VERKOCHT", soldTitle: "Bekijk recent verkochte machines", soldBtn: "Ga naar recent verkocht →",
+    footerVisit: "Bezoek ons", footerContact: "Neem contact op", footerHours: "Openingstijden",
+    footerHoursText: "Maandag t/m vrijdag: 08:00–16:00\nZaterdag en zondag op afspraak",
+    footerMenu: "Menu", footerCopyright: "© 2026 Oslo Maskin AS. Alle rechten voorbehouden.", footerPrivacy: "Privacy",
+    chatTitle: "Chat met Oslo Maskin", chatGreeting: "Hoi! Vraag me naar openingstijden, contact, locatie of machines. 👋",
+    chatPlaceholder: "Typ een bericht...", chatSend: "Verstuur",
+    chatQ1: "Openingstijden", chatQ2: "Contactgegevens", chatQ3: "Waar zijn jullie gevestigd?", chatQ4: "Machine verkopen?",
+    chatA1: "We zijn open van maandag t/m vrijdag 08:00–16:00. Zaterdag en zondag op afspraak.",
+    chatA2: "Bereik ons via +47 639 00 990 / +47 925 02 024 of info@oslomaskin.com.",
+    chatA3: "We zijn gevestigd op Gardermovegen 130, 2030 Nannestad — 7 minuten van luchthaven Oslo Gardermoen.",
+    chatA4: "We kopen en nemen graag alle bouwmachines en vrachtwagens in — neem contact op via WhatsApp.",
+    chatFallback: "Bedankt voor je bericht! Voor het snelste antwoord, neem direct contact op via WhatsApp of telefoon +47 925 02 024."
+  },
+  ar: {
+    langName: "العربية",
+    heroTitle: "شراء وبيع معدات البناء والشاحنات المستعملة",
+    heroP1: "تتخصص Oslo Maskin AS في شراء وبيع وتصدير معدات البناء والشاحنات والمعدات المتخصصة المستعملة. بفضل الخبرة الطويلة والتسوية السريعة والخدمات اللوجستية الفعالة، نقدم تجارة آمنة ومهنية وموثوقة للعملاء في النرويج وحول العالم.",
+    heroP2: "هل لديك معدة بناء أو شاحنة ترغب في بيعها؟ تواصل معنا للحصول على تجارة سريعة ومنظمة وخالية من المخاطر. نقدم تقييماً سريعاً وتسوية في نفس اليوم واستلاماً في جميع أنحاء النرويج.",
+    navHome: "الرئيسية", navForSale: "للبيع", navSold: "تم بيعه مؤخراً", navAbout: "من نحن", navContact: "اتصل بنا",
+    heroBadge: "محلياً ودولياً",
+    heroTitle: "كل ما يتعلق بشراء وبيع الشاحنات ومعدات البناء",
+    heroDesc: "مورد محترف لمعدات البناء المستعملة والشاحنات والمعدات المتخصصة لصناعة البناء — منظم وسريع وخالٍ من المخاطر.",
+    ctaForSale: "للبيع", ctaContact: "اتصل بنا", ctaEmail: "البريد الإلكتروني", emailAppOption: "تطبيق البريد",
+    introTitle: "معدات البناء والمعدات لمختلف الصناعات",
+    introP1: "شركة Oslo Maskin AS هي مورد محترف لشراء وبيع معدات البناء المستعملة والشاحنات والمعدات المتخصصة لصناعة البناء. نعمل محلياً ودولياً، ونقدم عمليات تجارية فعالة ومنظمة مع التركيز على الجودة والموثوقية.",
+    introP2: "تشمل مجموعتنا الحفارات واللوادر ذات العجلات والقلابات والمداحل والمُسويات والرافعات التلسكوبية وحفارات الآبار والكسارات والرافعات الشوكية والشاحنات — مصممة لتلبية احتياجات العملاء بخبرة عالية ومتابعة سريعة.",
+    forSaleTitle: "اكتشف أحدث المنتجات", forSaleSub: "ألق نظرة على بعض منتجاتنا واعثر على ما تبحث عنه.", readMore: "اقرأ المزيد",
+    sellTitle: "هل لديك شاحنات أو معدات بناء أو معدات للبيع؟", sellSub: "تواصل معنا لمحادثة ودية.",
+    ctaWhatsapp: "تواصل معنا عبر واتساب", ctaEmailBtn: "أرسل بريداً إلكترونياً",
+    fbTitle: "لا تفوت أحدث العروض", fbSub: "تابعنا على فيسبوك واطّلع على أحدث عروضنا وحملاتنا.", fbBtn: "تابعنا على فيسبوك",
+    qualityTitle: "جودة عالية وخدمة عملاء ممتازة", qualitySub: "شراء المعدات — منظم وسريع وخالٍ من المخاطر.",
+    qualityP: "نتعاون مع مصنعين وموردين معتمدين على مستوى العالم ونضع معايير جودة عالية. تتم جميع المعاملات بطريقة منظمة ومهنية وآمنة، بشروط واضحة وتسليم في الوقت والسعر المتفق عليهما.",
+    soldBadge: "تم بيعه مؤخراً", soldTitle: "شاهد الآلات التي بعناها مؤخراً", soldBtn: "← اذهب إلى تم بيعه مؤخراً",
+    footerVisit: "زرنا", footerContact: "اتصل بنا", footerHours: "ساعات العمل",
+    footerHoursText: "الاثنين إلى الجمعة: 08:00–16:00\nالسبت والأحد حسب الموعد",
+    footerMenu: "القائمة", footerCopyright: "© 2026 Oslo Maskin AS. جميع الحقوق محفوظة.", footerPrivacy: "الخصوصية",
+    chatTitle: "الدردشة مع Oslo Maskin", chatGreeting: "مرحباً! اسألني عن ساعات العمل أو التواصل أو الموقع أو الآلات. 👋",
+    chatPlaceholder: "اكتب رسالة...", chatSend: "إرسال",
+    chatQ1: "ساعات العمل", chatQ2: "معلومات الاتصال", chatQ3: "أين تقعون؟", chatQ4: "بيع آلة؟",
+    chatA1: "نحن مفتوحون من الاثنين إلى الجمعة 08:00–16:00. السبت والأحد حسب الموعد.",
+    chatA2: "يمكنكم التواصل معنا على +47 639 00 990 / +47 925 02 024 أو info@oslomaskin.com.",
+    chatA3: "نقع في Gardermovegen 130, 2030 Nannestad — على بعد 7 دقائق من مطار أوسلو غاردرموين.",
+    chatA4: "نشتري ونقبل بكل سرور المقايضة بأي معدات بناء أو شاحنات — تواصل معنا عبر واتساب.",
+    chatFallback: "شكراً لرسالتك! للحصول على أسرع رد، تواصل معنا مباشرة عبر واتساب أو الهاتف +47 925 02 024."
+  },
+  sv: {
+    langName: "Svenska",
+    heroTitle: "Köp och försäljning av begagnade anläggningsmaskiner och lastbilar",
+    heroP1: "Oslo Maskin AS är specialiserat på köp, försäljning och export av begagnade anläggningsmaskiner, lastbilar och specialutrustning. Med lång erfarenhet, snabb betalning och effektiv logistik erbjuder vi en trygg, professionell och förutsägbar handel till kunder i Norge och över hela världen.",
+    heroP2: "Har du en anläggningsmaskin eller lastbil du vill sälja? Kontakta oss för en snabb, ryddig och riskfri affär. Vi erbjuder snabb värdering, betalning samma dag och hämtning i hela Norge.",
+    navHome: "Hem", navForSale: "Till salu", navSold: "Nyligen sålda", navAbout: "Om oss", navContact: "Kontakt",
+    heroBadge: "NATIONELLT & INTERNATIONELLT",
+    heroTitle: "Allt inom köp och försäljning av lastbilar och anläggningsmaskiner",
+    heroDesc: "Professionell leverantör av begagnade anläggningsmaskiner, lastbilar och specialutrustning till bygg- och anläggningsbranschen — ryddigt, snabbt och riskfritt.",
+    ctaForSale: "Till salu", ctaContact: "Kontakta oss", ctaEmail: "E-post", emailAppOption: "E-postapp",
+    introTitle: "Anläggningsmaskiner och utrustning för olika branscher",
+    introP1: "Oslo Maskin AS är en professionell leverantör av köp och försäljning av begagnade anläggningsmaskiner, lastbilar och specialutrustning till bygg- och anläggningsbranschen. Vi verkar både nationellt och internationellt, och levererar effektiva och ryddiga handelsprocesser med fokus på kvalitet och pålitlighet.",
+    introP2: "Vårt sortiment inkluderar bland annat grävmaskiner, hjullastare, dumprar, vältar, väghyvlar, teleskoplastare, borriggar, krossar, gaffeltruckar och lastbilar — anpassade efter kundens behov med hög fackkompetens och snabb uppföljning.",
+    forSaleTitle: "Hitta de senaste produkterna", forSaleSub: "Ta en titt på några av våra produkter och hitta det du letar efter.", readMore: "Läs mer",
+    sellTitle: "Har du lastbilar, anläggningsmaskiner eller utrustning att sälja?", sellSub: "Kontakta oss för ett trevligt samtal.",
+    ctaWhatsapp: "Kontakta oss på WhatsApp", ctaEmailBtn: "Skicka e-post",
+    fbTitle: "Missa inte de senaste erbjudandena", fbSub: "Följ oss på Facebook och se våra senaste erbjudanden och kampanjer.", fbBtn: "Följ oss på Facebook",
+    qualityTitle: "Hög kvalitet och god kundservice", qualitySub: "Uppköp av maskiner — ryddigt, snabbt och riskfritt.",
+    qualityP: "Vi samarbetar med etablerade tillverkare och leverantörer globalt och ställer höga kvalitetskrav. Alla transaktioner genomförs på ett strukturerat, professionellt och tryggt sätt, med tydliga avtalsvillkor och leverans till avtalad tid och pris.",
+    soldBadge: "NYLIGEN SÅLDA", soldTitle: "Se maskiner vi nyligen har sålt", soldBtn: "Gå till Nyligen sålda →",
+    footerVisit: "Besök oss", footerContact: "Kontakta oss", footerHours: "Öppettider",
+    footerHoursText: "Måndag till fredag: 08:00–16:00\nLördag och söndag efter överenskommelse",
+    footerMenu: "Meny", footerCopyright: "© 2026 Oslo Maskin AS. Alla rättigheter förbehållna.", footerPrivacy: "Integritet",
+    chatTitle: "Chatta med Oslo Maskin", chatGreeting: "Hej! Fråga mig om öppettider, kontakt, plats eller maskiner. 👋",
+    chatPlaceholder: "Skriv ett meddelande...", chatSend: "Skicka",
+    chatQ1: "Öppettider", chatQ2: "Kontaktinfo", chatQ3: "Var håller ni till?", chatQ4: "Sälja maskin?",
+    chatA1: "Vi har öppet måndag–fredag 08:00–16:00. Lördag och söndag efter överenskommelse.",
+    chatA2: "Du når oss på +47 639 00 990 / +47 925 02 024 eller info@oslomaskin.com.",
+    chatA3: "Vi håller till på Gardermovegen 130, 2030 Nannestad — 7 minuter från Oslo flygplats Gardermoen.",
+    chatA4: "Vi köper och tar gärna byten i alla anläggningsmaskiner och lastbilar — hör av dig på WhatsApp så ordnar vi resten.",
+    chatFallback: "Tack för ditt meddelande! För snabbast svar, kontakta oss direkt på WhatsApp eller telefon +47 925 02 024."
+  }
+};
+
+const HJEM_OVERRIDES_KEY = "oslomaskin_hjem_overrides_v1";
+const SUPABASE_URL = "https://znrjizjlwrsgcpezswbr.supabase.co";
+const SUPABASE_KEY = "sb_publishable_6iLCnVmK-4K2g3vQ-cJ_8w_SZZOS77-";
+async function fetchSiteData(key) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/site_content?key=eq.${key}&select=value`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` }
+    });
+    const rows = await res.json();
+    return rows && rows[0] ? rows[0].value : null;
+  } catch (e) { return null; }
+}
+async function saveSiteData(key, value) {
+  try {
+    await fetch(`${SUPABASE_URL}/rest/v1/site_content`, {
+      method: "POST",
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", Prefer: "resolution=merge-duplicates" },
+      body: JSON.stringify({ key, value })
+    });
+  } catch (e) {}
+}
+
+const OSLO_MASKIN_SYSTEM_PROMPT = `Du er kundeservice-assistenten på nettsiden til Oslo Maskin AS, en norsk bedrift som kjøper og selger brukte anleggsmaskiner, lastebiler og spesialutstyr, nasjonalt og internasjonalt.
+
+Fakta om bedriften:
+- Adresse: Gardermovegen 130, 2030 Nannestad, Norge (ca. 7 minutter med bil fra Oslo Lufthavn Gardermoen; kunder som kommer med fly kan bli hentet på flyplassen etter avtale)
+- Telefon / WhatsApp: +47 639 00 990 og +47 925 02 024
+- E-post: info@oslomaskin.com
+- Åpningstider: mandag til fredag 08:00–16:00. Lørdag og søndag etter avtale.
+- Org.nr: 921 591 020
+- De selger blant annet gravemaskiner, hjullastere, dumpere, veihøvler, teleskoplastere, traktorer, lastebiler og diverse utstyr (skuffer, tilt, hengere, kompressorer m.m.)
+- De tar gjerne innbytte av anleggsmaskiner og lastebiler, og kjøper maskiner fra hele landet med egen frakt.
+- Nettsiden har sider for "Til salgs" (maskiner til salgs nå), "Sist solgt" (nylig solgte maskiner), "Om oss" og "Kontakt".
+
+Din oppgave: svar hjelpsomt, vennlig og kort (maks 3-4 setninger) på ALT brukeren spør om — åpningstider, kontaktinfo, hvor de holder til, hvordan man selger eller kjøper en maskin, generelle spørsmål om maskiner/bransjen, eller annet småprat. Svar ALLTID på samme språk som brukeren skriver på, uansett hvilket språk det er. Hvis du er usikker på detaljer om en spesifikk maskin, be dem se på "Til salgs"-siden eller ta kontakt direkte på telefon/WhatsApp/e-post. Ikke finn på priser eller spesifikke maskindetaljer du ikke har fått oppgitt.`;
+
+class Component extends DCLogic {
+  state = {
+    openIndex: null,
+    lang: "no",
+    langMenuOpen: false,
+    chatOpen: false,
+    chatInput: "",
+    chatLog: [],
+    editMode: false,
+    overrides: {},
+    isMobile: false,
+    mobileMenuOpen: false,
+    emailMenuOpen: false
+  };
+
+  toggleEmailMenu = () => this.setState(s => ({ emailMenuOpen: !s.emailMenuOpen }));
+
+  setLang = (lang) => {
+    this.setState({ lang, langMenuOpen: false });
+    try { localStorage.setItem("oslomaskin_lang", lang.toUpperCase()); } catch (e) {}
+  };
+  toggleLangMenu = () => this.setState(s => ({ langMenuOpen: !s.langMenuOpen }));
+  componentDidMount() {
+    try {
+      const savedScroll = sessionStorage.getItem("oslomaskin_scroll_Oslo_Maskin_Hjem_dc_html");
+      if (savedScroll) requestAnimationFrame(() => window.scrollTo(0, parseInt(savedScroll, 10) || 0));
+      window.addEventListener("scroll", () => { sessionStorage.setItem("oslomaskin_scroll_Oslo_Maskin_Hjem_dc_html", String(window.scrollY)); }, { passive: true });
+    } catch (e) {}
+    try {
+      const saved = localStorage.getItem("oslomaskin_lang");
+      const lower = saved ? saved.toLowerCase() : null;
+      if (lower && TRANSLATIONS[lower]) this.setState({ lang: lower });
+      const raw = localStorage.getItem(HJEM_OVERRIDES_KEY);
+      if (raw) this.setState({ overrides: JSON.parse(raw) });
+    } catch (e) {}
+    fetchSiteData("hjem").then(data => { if (data) this.setState({ overrides: data }); });
+    try {
+      const key = "scrollpos_" + location.pathname;
+      const saved = sessionStorage.getItem(key);
+      if (saved) requestAnimationFrame(() => window.scrollTo(0, parseFloat(saved)));
+      window.addEventListener("scroll", () => sessionStorage.setItem(key, window.scrollY), { passive: true });
+    } catch (e) {}
+    this.updateIsMobile();
+    window.addEventListener("resize", this.updateIsMobile);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.updateIsMobile);
+  }
+
+  updateIsMobile = () => {
+    const isMobile = window.innerWidth < 900;
+    if (isMobile !== this.state.isMobile) this.setState({ isMobile, mobileMenuOpen: isMobile ? this.state.mobileMenuOpen : false });
+  };
+  toggleMobileMenu = () => this.setState(s => ({ mobileMenuOpen: !s.mobileMenuOpen }));
+
+  toggleEditMode = () => {
+    if (this.state.editMode) { this.setState({ editMode: false }); return; }
+    const pw = window.prompt("Skriv inn passord for å redigere:");
+    if (pw === "2030") this.setState({ editMode: true });
+    else if (pw !== null) window.alert("Feil passord.");
+  };
+
+  setOverride = (field, value) => {
+    const key = this.state.lang + "." + field;
+    const updated = { ...this.state.overrides, [key]: value };
+    this.setState({ overrides: updated });
+    try { localStorage.setItem(HJEM_OVERRIDES_KEY, JSON.stringify(updated)); } catch (e) {}
+    saveSiteData("hjem", updated);
+  };
+
+  getVal = (field, fallback) => {
+    const key = this.state.lang + "." + field;
+    return this.state.overrides[key] !== undefined ? this.state.overrides[key] : fallback;
+  };
+
+  toggleChat = () => this.setState(s => ({ chatOpen: !s.chatOpen }));
+
+  onChatInput = (e) => this.setState({ chatInput: e.target.value });
+
+  pushChat = (from, text) => this.setState(s => ({ chatLog: [...s.chatLog, { from, text }] }));
+
+  botReply = (userText) => {
+    const t = TRANSLATIONS[this.state.lang];
+    const low = userText.toLowerCase();
+    let reply = t.chatFallback;
+    if (low.includes("åpen") || low.includes("open") || low.includes("hour") || low.includes("tid") || low.includes("zeit") || low.includes("öppet")) reply = t.chatA1;
+    else if (low.includes("kontakt") || low.includes("contact") || low.includes("telefon") || low.includes("phone") || low.includes("mail") || low.includes("epost") || low.includes("email")) reply = t.chatA2;
+    else if (low.includes("hvor") || low.includes("where") || low.includes("adress") || low.includes("adresse") || low.includes("locat") || low.includes("nannestad")) reply = t.chatA3;
+    else if (low.includes("selg") || low.includes("sell") || low.includes("verkauf") || low.includes("sälj") || low.includes("innbytte") || low.includes("trade")) reply = t.chatA4;
+    return reply;
+  };
+
+  sendChat = async () => {
+    const text = this.state.chatInput.trim();
+    if (!text) return;
+    this.pushChat("user", text);
+    this.setState({ chatInput: "" });
+    this.pushChat("bot", "…");
+    const replaceThinking = (finalText) => {
+      this.setState(s => {
+        const log = [...s.chatLog];
+        for (let i = log.length - 1; i >= 0; i--) {
+          if (log[i].from === "bot" && log[i].text === "…") { log[i] = { from: "bot", text: finalText }; break; }
+        }
+        return { chatLog: log };
+      });
+    };
+    try {
+      const history = this.state.chatLog.filter(m => m.text !== "…").slice(-8).map(m => ({ role: m.from === "user" ? "user" : "assistant", content: m.text }));
+      const reply = await window.claude.complete({
+        system: OSLO_MASKIN_SYSTEM_PROMPT,
+        messages: [...history, { role: "user", content: text }]
+      });
+      replaceThinking(reply && reply.trim() ? reply.trim() : this.botReply(text));
+    } catch (e) {
+      replaceThinking(this.botReply(text));
+    }
+  };
+
+  quickChat = (question, answerKey) => {
+    const t = TRANSLATIONS[this.state.lang];
+    this.pushChat("user", question);
+    setTimeout(() => this.pushChat("bot", t[answerKey]), 350);
+  };
+
+  products = [
+    { name: "Komatsu PC240LC-11E0", meta: "2019 Modell, 8041 Timer", price: "NOK 899 000,- pluss moms", type: "Gravemaskin", image: "assets/komatsu-pc240lc.jpg",
+      description: "Meget pen og velholdt Komatsu PC240LC-11E0 fra 2019 med ca. 8041 timer. Alle servicer er fulgt og siste service ble utført for kun ca. 85 timer siden. Maskinen er nylig sertifisert, og neste sertifisering er gyldig til juni 2027. Maskinen er klar til å settes rett i arbeid.",
+      videoUrl: "https://www.youtube.com/watch?v=wR-D5QK18aw",
+      specs: ["Årsmodell: 2019", "Modell: Komatsu PC240LC-11E0", "Timer: 8041 t", "Motoreffekt: 141 kW", "Egenvekt: 25 600 kg", "Serienummer: K75023"],
+      equipment: ["Leica 3D GPS-maskinstyring", "Rototilt R8 med hydraulisk uttak", "Rototilt-spaker", "Sentralsmøring på maskin", "Sentralsmøring på Rototilt", "Hammer hydraulikk", "X-kobling", "Gjerstad HK-Feste S70", "Gjerstad graveskuff S70", "Gjerstad pusseskuff S70", "Webasto", "Klimaanlegg (A/C)", "LED-arbeidslys", "LED-merkeringlys", "4 kameraer rundt hele maskinen", "Elektrisk dieselpåfyllingspumpe", "CE-merket"]
+    },
+    { name: "Hitachi ZX130LCN", meta: "2008 Modell, 12294 Timer", price: "NOK 375 000,- pluss moms", type: "Gravemaskin", image: "assets/hitachi-zx130.jpg",
+      description: "Hitachi ZX130 LCN selges. En helt grei og driftssikker maskin som fungerer som den skal, og er i daglig bruk en gårdsmaskin. Maskinen har normale kosmetiske bulker, riper og bruksspor i henhold til alder og timetall. Se bilder og video for nærmere inntrykk av den visuelle tilstanden.",
+      videoUrl: "https://youtu.be/VeU23JJm7Zw?is=VN_sPKudVkuNiFLv",
+      specs: ["Egenvekt: 13 400 kg", "Motoreffekt: 66 kW"],
+      equipment: ["Rototilt med hydraulikkuttak", "Pusseskuff S60", "Graveskuff S60", "Hydraulisk HK-feste", "CE-merket"]
+    },
+    { name: "Volvo EC140BLC", meta: "2003 Modell, 8484 Timer", price: "NOK 374 000,- pluss moms", type: "Gravemaskin", image: "assets/volvo-ec140blc.jpg",
+      description: "Volvo EC140BLC, 2003 modell med 8485 timer. Maskinen fremstår i normal stand for alder og timer, og fungerer som den skal. God og driftssikker gårdsmaskin.",
+      videoUrl: "https://youtu.be/MZ6-vor47n0?is=w5iXfqQJ0BbVbhb0",
+      specs: ["Egenvekt: 14 700 kg", "Motoreffekt: 69 kW"],
+      equipment: ["Steelwrist rototilt, 2009 mod.", "Hydraulikkuttak på rototilt", "Hammerhydraulikk på stykke", "Pusseskuff 750 liter, S60", "Gjerstad HK-feste S60", "LED-lys", "CE-merket"]
+    },
+    { name: "Komatsu PC228USLC-3EO", meta: "2008 Modell, 10310 Timer", price: "NOK 449 000,- pluss moms", type: "Gravemaskin", image: "assets/komatsu-pc228us.jpg",
+      description: "Solid og enkel gravemaskin som fungerer som den skal. En grei arbeidsmaskin som passer godt til gårdsbruk, vedlikeholdsarbeid, skogsveier, grøftearbeid eller andre oppgaver hvor man ønsker en rimelig og driftssikker maskin. Dette er ingen ny maskin, og normal slitasje etter alder og timer må påregnes. Likevel fremstår den som en helt grei og funksjonell arbeidsmaskin som fortsatt har mye arbeid igjen i seg.",
+      videoUrl: "https://youtu.be/gG1jcJMy4p8?is=mihyLxrYT2b-Brkx",
+      specs: ["Årsmodell: 2008", "Timer: 10 310 t", "Motoreffekt: 110 kW", "Egenvekt: 22 900 kg", "Transportbredde: 299 cm", "Kan transporteres uten følgebil"],
+      equipment: ["Rotortilt", "HK-feste S70", "Pusseskuff S70", "Skjær", "Sentralsmøring", "Hammer hydraulikkuttak", "Klimaautomatikk / A/C", "Radio", "Arbeidslys"]
+    },
+    { name: "Scania R580 6x4", meta: "2015 Modell, 494 345 Km", price: "NOK 429 000,-", type: "Lastebil", image: "assets/scania-r580.jpg",
+      description: "Velholdt og kraftig Scania R580 6x4 tippbil selges. Solid arbeidsbil med sterk V8-motor, god utstyrspakke og praktisk oppsett for anlegg, massetransport og tung drift. Leveres med ny EU-godkjent. Bilen fremstår som godt utstyrt og klar for arbeid, med normal bruksslitasje ut fra alder og kilometerstand — veldig lite rust på chassis, trekk og tippkasse som forventet.",
+      specs: ["Merke / modell: Scania R580", "Registreringsnummer: HT15503", "Førstegangsregistrert: 09.02.2015", "Kjøretøygruppe: N3G lastebil", "Miljøklasse: Euro 6T", "Drivlinje: 6x4", "Girkasse: Scania Opticruise automat", "Kilometerstand: 494 345 km", "Dekkdimensjon: 315/80 R22.5", "Hastighetssperre: 89 km/t", "Påbygg: Tipp", "Trekk: VBG hengerfeste med luft- og el-tilkoblinger", "EU-godkjent: Leveres EU-godkjent"],
+      equipment: ["Scania V8 motor", "Stålfjæring foran og bak", "Sovekabin med seng", "Kjøleskap", "Komfortseter", "Klimaanlegg / automatisk klima", "Varm i kasse", "Tipphydraulikk", "WAECO ryggekamera", "Motor-/kupévarmer", "Scania multimedia / radio", "AUX / USB", "Navigasjon", "Cruisekontroll", "Retarder / hjelpebrems", "Differensialsperre", "Arbeidslys / ekstralys", "Oppbevaringsløsninger", "Gode dekk", "2 nøkler medfølger"]
+    },
+    { name: "Fendt 824 Vario SCR", meta: "2014 Modell, 9942 Timer", price: "NOK 899 000,- pluss moms", type: "Traktor", image: "assets/fendt-824.jpg",
+      description: "Meget pen og godt utstyrt Fendt 824 Vario SCR selges. Kraftig premiumtraktor med høy komfort, godt egnet til landbruk, transport, snørydding og entreprenørarbeid. Traktoren har hatt 1 eier, alle servicer er fulgt, og neste service er om ca. 200 timer. Det er nylig utført tilstandsrapport hos EIK Senteret, og anmerkningene som fremkom der er utbedret. Traktoren fremstår som en solid og velholdt maskin med mye nyttig utstyr, klar for levering.",
+      videoUrl: "https://youtu.be/EgsPIE3ycPU?is=06H8p840q3Fup5n_",
+      specs: ["Årsmodell: 2014", "Timer: 9942 t", "Effekt: 237 hk / 174 kW", "Motor: 6 056 cm³ diesel", "Drivlinje: 4x4", "Registreringsnummer: PK2393", "Understellsnummer: 834231180", "Neste EU-kontroll: 18.02.2028"],
+      equipment: ["Quicke frontlaster", "Frontskuffe", "Hydraulisk skuffetilt", "Fronthydraulikk", "Front PTO", "Hydraulikkuttak foran", "Kraftuttak bak", "Flere hydraulikkuttak bak", "Power Beyond", "ISOBUS-uttak bak", "Luftbrems / hengerbrems", "Duo-Matic luftkobling", "Automatisk trekkrok / hitch", "Trinnløs Vario transmisjon", "Fjærende foraksel", "Fendt Vario terminal", "Multifunksjons joystick", "Klimaanlegg", "Luftfjæret førersete", "Passasjersete", "Radio", "Arbeidslys foran og bak", "Takmontert LED-lysrampe", "Varsellys", "Store hjul/dekk", "4 stk kjettinger", "Instruksjonsbok / dokumentasjon følger med"]
+    },
+    { name: "CAT M317F", meta: "2017 Modell, 11700 Timer", price: "NOK 980 000,- pluss moms", type: "Hjulgraver", image: "assets/cat-m317f.jpg",
+      description: "Meget pen og velholdt hjulgraver, solgt ny i Norge (ikke bruktimport) og har hatt kun 1 eier og er registrert i maskinregistret. Komplett servicehistorikk hos Caterpillar — siste service utført 12.2025 (ca. 11 537 t), neste service ved 12 000 timer. Sertifisert 12.2025, neste sertifisering 12.2026.",
+      videoUrl: "https://youtu.be/QMs8m0sd0VI?is=_TGjjKuufHV-epmK",
+      specs: ["Årsmodell: 2017", "Timer: ca. 11 717 t", "Motoreffekt: 117 kW", "Egenvekt: ca. 18 400 kg", "GPS/maskinstyring: komplett med stor touch-skjerm i hytte"],
+      equipment: ["Engcon tilt med hydraulikkuttak", "Engcon MIG2 rototilt-spaker", "Graveskuff", "Pusseskuff", "Hydraulisk HK-feste", "Sentralsmøring på maskin og frem til rototilt", "Kombihydraulikk", "Ekstra hydraulikkuttak på bom", "Frontskjær", "Hengerfeste med tippebrems", "Gode dekk (Alliance Dual Master)", "LED arbeidslys", "Riggkamera og sidekamera", "Elektriske speil", "Radio / multimedia", "Klimaanlegg A/C", "Webasto", "CE-merket", "Komfortsete"]
+    },
+    { name: "Volvo L120F", meta: "2008 Modell, 18400 Timer", price: "NOK 449 000,- pluss moms", type: "Hjullaster", image: "assets/volvo-l120f.jpg",
+      description: "Solid og driftssikker hjullaster selges. Maskinen er i daglig bruk, men toppakning i motor må byttes da motor blander olje i kjølevæske — maskinen starter og går som den skal likevel.",
+      videoUrl: "https://youtu.be/nCTPwYED-OM?is=oFVnN0rV9tjVDGQY",
+      equipment: ["3. og 4. funksjon hydraulikk", "Hydraulikkuttak + el-uttak foran", "Opplegg for brøyteutstyr", "Hydraulikk multifaster kobling", "Spakstyring (joystick) m/F-R", "Hydraulisk BM-feste", "Fjærende bom (ride control)", "Sentralsmøring", "Ryggekamera med skjerm", "A/C og radio", "LED-lys", "Komfortabel førerhytte", "Michelin dekk"]
+    },
+    { name: "CAT M318 F", meta: "2018 Modell, 9874 Timer", price: "NOK 849 000,- pluss moms", type: "Hjulgraver", image: "assets/cat-m318f.jpg",
+      description: "Hjulgraver Caterpillar M318F, 2018 modell selges. Maskinen har gått 9874 timer, hvor ca. 41 % er tomgangstid. Maskinen fremstår som meget pen og godt vedlikeholdt, og er i god teknisk stand. 1-eiers maskin, solgt ny i Norge (ikke import). Opplegg for HK-feste er komplett, men krok mangler. Maskinen er pen i forhold til alder og timer, og fungerer slik den skal.",
+      videoUrl: "https://youtu.be/J1YBHibtvnk?is=v86sDc1KlZbjkhDD",
+      equipment: ["GPS maskinstyring", "R6 Rototilt med OilQuick", "Rototilt-spaker", "HK-feste OilQuick", "S70 feste", "Sentralsmøring på maskin", "Sentralsmøring på rototilt", "Hengerfeste med brems og tipp", "LED arbeidslys", "Skjær", "CAT pusseskuff", "Kombihydraulikk", "Ryggekamera", "Diesel sugepumpe", "CE-merket"]
+    },
+    { name: "CAT 908 H2", meta: "2014 Modell, 6000 Timer", price: "NOK 419 000,- pluss moms", type: "Hjullaster", image: "assets/cat-908h2.jpg",
+      description: "Selger en Caterpillar 908H2 hjullaster, 2014 modell. 6015 timer, maskinen er i daglig bruk og fungerer slik den skal. Leveres med ny sertifisering før levering. Maskinen fremstår i normal brukt stand i forhold til alder og timer.",
+      videoUrl: "https://youtu.be/tLaS4oB3lnc?is=qaPDaeJIOk9lRXD5",
+      equipment: ["Hydraulisk uttak foran", "Strømuttak foran", "Liten Volvo BM-feste", "2 skuffer følger med", "A/C aircondition", "Gode Nokian piggdekk"]
+    },
+    { name: "Liebherr A924 Litronic", meta: "2000 Modell, 12980 Timer", price: "NOK 399 000,- pluss moms", type: "Hjulgraver", image: "assets/liebherr-a924.jpg",
+      description: "Solid og driftssikker materialhåndterer med hydraulisk klo/grabb. Velegnet til skrap, sortering og rivningsarbeid. Alle servicer er tatt. Maskinen starter og går fint.",
+      videoUrl: "https://youtu.be/S_TOYqBB4g0?si=0r7DE6eEZwECbise",
+      specs: ["Årsmodell: 2000", "Timer: 12 980 t", "Motoreffekt: 112 kW", "Totalvekt: 24 000 kg", "Hastighet: 20 km/t"],
+      equipment: ["Hydraulisk Liebherr grabb", "Elektrisk motor/generator for tilleggsutstyr", "Støttebein og skjær", "Litronic system", "Sentralsmøring", "Helgummi dekk"]
+    },
+    { name: "Komatsu PC290 LC-8", meta: "2008 Modell, 14196 Timer", price: "NOK 270 000,- pluss moms", type: "Gravemaskin", image: "assets/komatsu-pc290.jpg",
+      description: "Solid og sprek maskin, virker helt greit.",
+      videoUrl: "https://youtu.be/K_WK4DQUmkA?si=y4t9VXK9-o0YEcoC",
+      equipment: ["Hydraulikk til hammer", "Sentralsmøring", "HK-feste"]
+    },
+    { name: "Volvo L150E", meta: "2005 Modell, 19804 Timer", price: "NOK 449 000,- pluss moms", type: "Hjullaster", image: "assets/volvo-l150e.jpg",
+      description: "Meget pen og velholdt maskin som har vært i daglig drift. Alle servicer er fulgt og utført fortløpende. Maskinen er solgt ny i Norge og har ikke vært brukt som importmaskin. Merk: maskinen har feil på 3. gir. Selges som den står.",
+      videoUrl: "https://youtu.be/x589wECFiaQ?si=JjYnAClPyZ5TWYm7",
+      equipment: ["Gjerstad skuffe med rett front og bolt-on skjær", "HK-feste", "Ekstra hydraulikk", "Vekt med skriver", "Spakstyring", "Sentralsmøring", "Ekstra lodd", "A/C (klimaanlegg)"]
+    },
+    { name: "HENRA Major Xpert MT35-3519", meta: "7 års garanti", price: "NOK 79 900,- + mva", type: "Tilhenger", image: "assets/henra-mt35.jpg",
+      description: "Ny maskinhenger — HENRA Major Xpert MT35-3519, 7 års garanti. Hengeren er helt ny og vil bli førstegangsregistrert på ny eier ved salg. Klar for levering. Solid og kraftig maskinhenger av høy kvalitet, en av de beste modellene på markedet, utviklet for profesjonell bruk og lang levetid. Henra gir 2 års garanti mot produksjons- og konstruksjonsfeil, og 7 års garanti mot gjennomrusting av chassis/ramme.",
+      specs: ["Totalvekt: 3500 kg", "Egenvekt: 896 kg", "Nyttelast: 2604 kg", "Innvendig lengde: 3,55 m", "Innvendig bredde: 1,90 m", "Total lengde: 5,43 m", "Total bredde: 2,50 m", "Lastehøyde: 35 cm", "Karmhøyde: 27 cm", "Rampehøyde: 110 cm"],
+      equipment: ["Komplett LED bak- og markeringslys", "Antiskli belegg på begge skjermer", "Baklysbeskyttere, pulverlakkert svart", "Ekstra kraftig nesehjul (statisk 500 kg)", "Svarte refleksstriper front + rød på rampen", "Xpert-klistremerke", "Svarte felger, 185/60R12C", "Festepunkter i gulv, opptil 750 kg", "Kraftig rampe m/ støttebøyler og svinglås", "Kraftige \"Step on\" skjermer", "Kraftige surrefester", "13-pol lyskontakt", "Solid skuffefeste", "M+S helårsdekk"]
+    },
+    { name: "CAT 316 EL", meta: "2012 Modell, 8750 Timer", price: "NOK 690 000,- pluss moms", type: "Gravemaskin", image: "assets/cat-316el.jpg",
+      description: "CAT 316 EL selges. Maskinen fremstår i svært god stand i forhold til timer og alder. Alle servicer er fulgt opp og utført — siste service ble tatt for 35 timer siden. Maskinen leveres med ny sertifisering og er klar for bruk.",
+      videoUrl: "https://youtu.be/1_1x565FI1g?si=PPSykwfI9sxsn7Ke",
+      equipment: ["Engcon tilt med hydraulikkuttak", "Gjerstad HK-feste S60", "SMP pusseskuff", "SMP graveskuff", "Kombihydraulikk", "LED lysbar", "Sentralsmøring", "Bunkringspumpe", "Klimaanlegg", "Ryggekamera"]
+    },
+    { name: "Manitou MT 1840 ST3B", meta: "2015 Modell, 5918 Timer", price: "NOK 499 000,- pluss moms", type: "Teleskoplaster", image: "assets/manitou-mt1840.jpg",
+      description: "Pen og kraftig teleskoplaster fra Manitou, modell MT 1840 ST3B, som fremstår som godt vedlikeholdt, starter lett, går pent og fungerer som den skal, med normal bruksslitasje i henhold til alder og timer. Alle servicer er tatt — klar for bruk.",
+      specs: ["Årsmodell: 2015", "Timer: 5918 t", "Løftekapasitet: 4000 kg", "Løftehøyde: 18 meter", "4-hjulsstyring med 3 muligheter", "4x4 firehjulstrekk", "Egenvekt: ca. 11 710 kg", "Motoreffekt: 75 kW", "CE-merket"],
+      equipment: ["Støttebein (front)", "Hydraulisk pallegafler", "Skuffe (en liten skade)", "Løftebom / kranarm (jib)", "Hurtigfeste", "Arbeidslys", "Radio"]
+    },
+    { name: "Mercedes-Benz Actros 2544", meta: "2005 Modell, 463 900 Km", price: "NOK 399 000,-", type: "Lastebil", image: "assets/mb-actros2544.jpg",
+      description: "Mercedes-Benz Actros 2544L, 2005 modell, km. 463 900, 6x2, sving og luft på 3. akselet. Kran EFFER 255/6S, 2013 modell, radiostyring, virker som den skal, sertifisert til sep. 2025.",
+      videoUrl: "https://youtu.be/tOBSudIVmxM?si=pEgStt09ZBvRG79t"
+    },
+    { name: "CAT 330 CL", meta: "2005 Modell, 10423 Timer", price: "NOK 549 000,-", type: "Gravemaskin", image: "assets/cat-330cl.jpg",
+      description: "CAT 330 CL, 2005 modell, 10423 timer, 1-eier. Pen og velholdt maskin i god teknisk stand.",
+      videoUrl: "https://youtu.be/FFRDAWzbGLQ?si=W1xNJCUqfhDZgjwe",
+      equipment: ["HK-feste", "Graveskuff", "Hammerhydraulikk", "Sentralsmøring", "Klimaanlegg A/C"]
+    },
+    { name: "Traktorgraver Leyland 270 / Hydan", meta: "1973 Modell, 4370 Timer", price: "På forespørsel", type: "Traktorgraver", image: "assets/leyland-270.jpg",
+      description: "Traktorgraver Leyland 270 / Hydan, 1973 modell, 4370 timer, 4 skuffer. Kun 2 eiere, virker som den skal.",
+      videoUrl: "https://youtu.be/grd-mEyAmpk?si=7kyCpayUx9GTafsz"
+    },
+    { name: "Div. Utstyr: Engcon tilt EC30 - S80", meta: "2015 Modell", price: "NOK 79 000,-", type: "Utstyr", image: "assets/engcon-ec30.jpg",
+      description: "Engcon tilt EC30 - S80, 2015 mod, pusseskuff S80, smalskuff S80, HK-feste 90 - S80, Leica iCON GPS 80. Disse utstyrene har vært på en Volvo EC300 EL, 2016 modell. God teknisk stand og virker som de skal.",
+      videoUrl: "https://youtu.be/TWWPKX6Flck?si=_5l0T7e37-CeUxJ9",
+      equipment: ["Engcon Rototilt EC30 - S80, 2015 mod. — kr 79 000,-", "Gjerstad pusseskuff S80, 1300 liter — kr 49 000,-", "Gjerstad smalskuff S80 — kr 29 000,-", "Gjerstad HK-feste 90 cm på bolter og S80 feste — kr 15 000,-", "Leica iCON GPS 80 med ledningsnett — kr 49 000,-"]
+    },
+    { name: "Hydraulisk pusseskuff S80 feste", meta: "2004 Modell", price: "NOK 49 000,- pluss moms", type: "Utstyr", image: "assets/pusseskuff-s80.jpg",
+      description: "Hydraulisk pusseskuff S80 feste, 1800 liter."
+    },
+    { name: "Feste Skuff S80", meta: "Tilbehør", price: "På forespørsel", type: "Utstyr", image: "assets/feste-skuff-s80.jpg",
+      description: "S80 feste skuff. Vi har mange flere typer skuffer — ta kontakt med oss om dere er interessert."
+    },
+    { name: "Feste Skuff S70", meta: "Tilbehør", price: "På forespørsel", type: "Utstyr", image: "assets/feste-skuff-s70.jpg",
+      description: "S70 feste skuff. Vi har mange flere typer skuffer — ta kontakt med oss om dere er interessert."
+    },
+    { name: "Feste Skuff SMP", meta: "Tilbehør", price: "På forespørsel", type: "Utstyr", image: "assets/feste-skuff-smp.jpg",
+      description: "SMP feste skuff. Vi har mange flere typer skuffer — ta kontakt med oss om dere er interessert."
+    },
+    { name: "Feste Skuff S70", meta: "Tilbehør", price: "På forespørsel", type: "Utstyr", image: "assets/feste-skuff-s70-b.jpg",
+      description: "S70 feste skuff. Vi har mange flere typer skuffer — ta kontakt med oss om dere er interessert."
+    },
+    { name: "Feste skuff S80", meta: "Tilbehør", price: "På forespørsel", type: "Utstyr", image: "assets/feste-skuff-s80-b.jpg",
+      description: "S80 feste skuff. Vi har mange flere typer skuffer — ta kontakt med oss om dere er interessert."
+    },
+    { name: "Feste Skuff KM2", meta: "Tilbehør", price: "På forespørsel", type: "Utstyr", image: "assets/feste-skuff-km2.jpg",
+      description: "KM2 feste skuff. Vi har mange flere typer skuffer — ta kontakt med oss om dere er interessert."
+    },
+    { name: "SMP Hydraulisk pusseskuff", meta: "S80 feste, 1600 Liter, 2017 Modell", price: "På forespørsel", type: "Utstyr", image: "assets/smp-hydraulisk-pusseskuff.jpg",
+      description: "SMP hydraulisk pusseskuff, S80 feste, 1600 liter, 2017 modell."
+    },
+    { name: "Feste skuff S70", meta: "Tilbehør", price: "På forespørsel", type: "Utstyr", image: "assets/feste-skuff-s70-c.jpg",
+      description: "S70 feste skuff. Vi har mange flere typer skuffer — ta kontakt med oss om dere er interessert."
+    },
+    { name: "Mesto Skumsprøyte 3270FE", meta: "Kun kr. 1000,- per stk.", price: "NOK 1 000,- / stk", type: "Utstyr", image: "assets/mesto-skumsproyte.jpg",
+      description: "Mesto skumsprøyte 3270FE med EPDM-pakning, egnet for midler med pH 7-12. Egnet for f.eks. rengjøring og desinfeksjon av kjøretøy i byggebransjen. Kapasitet 8 liter, maks trykk 3 bar, vekt 2,8 kg, slange 2,5 meter. Veiledende pris kr. 2370,-. Vi har mange på lager."
+    },
+    { name: "Atlas Copco RC308", meta: "2012 Modell", price: "NOK 39 000,-", type: "Utstyr", image: "assets/atlas-copco-rc308.jpg",
+      description: "Atlas Copco RC308, hydraulikk vibroplate med S50 og S40 feste, 2012 modell, 120-150 bar, ca. 300 kg. Virker som den skal, står hos oss på lager og klar for levering."
+    },
+    { name: "Leica iCON GPS", meta: "GPS-system", price: "NOK 35 000,- pluss moms", type: "Utstyr", image: "assets/leica-icon-gps.jpg",
+      description: "Leica iCON GPS, komplett system med skjerm, PowerBox, kabelnett og antenner. Selges for kr. 35 000,- pluss moms."
+    }
+  ];
+
+  openProduct = (i) => this.setState({ openIndex: i });
+  closeProduct = () => this.setState({ openIndex: null });
+  stopClick = (e) => e.stopPropagation();
+
+  renderVals() {
+    const openIndex = this.state.openIndex;
+    const products = this.products.map((p, i) => ({ ...p, onOpen: () => this.openProduct(i), noImage: !p.image }));
+    const t = TRANSLATIONS[this.state.lang];
+    const VISIBLE_LANGS = ["no", "en", "de", "fr", "pl", "ar"];
+    const langOptions = VISIBLE_LANGS.filter(c => TRANSLATIONS[c]).map(code => ({
+      code, name: TRANSLATIONS[code].langName, active: code === this.state.lang, onSelect: () => this.setLang(code)
+    }));
+    const chatLog = this.state.chatLog.map(m => ({ ...m, isUser: m.from === "user" }));
+    const editMode = this.state.editMode;
+    const editableFields = ["heroTitle", "heroP1", "heroP2", "introTitle", "introP1", "introP2"];
+    const vals = {};
+    const setters = {};
+    editableFields.forEach(f => {
+      vals[f + "Val"] = this.getVal(f, t[f]);
+      setters["set" + f[0].toUpperCase() + f.slice(1)] = (e) => this.setOverride(f, e.target.value);
+    });
+    return {
+      products,
+      hasOpen: openIndex !== null,
+      selected: openIndex !== null ? { ...this.products[openIndex], noImage: !this.products[openIndex].image } : null,
+      onClose: this.closeProduct,
+      stopClick: this.stopClick,
+      t,
+      ...vals,
+      ...setters,
+      editMode,
+      viewMode: !editMode,
+      toggleEditMode: this.toggleEditMode,
+      lang: this.state.lang,
+      langMenuOpen: this.state.langMenuOpen,
+      toggleLangMenu: this.toggleLangMenu,
+      isDesktop: !this.state.isMobile,
+      isMobile: this.state.isMobile,
+      mobileMenuOpen: this.state.mobileMenuOpen,
+      mobileMenuIcon: this.state.mobileMenuOpen ? "✕" : "☰",
+      toggleMobileMenu: this.toggleMobileMenu,
+      emailMenuOpen: this.state.emailMenuOpen,
+      toggleEmailMenu: this.toggleEmailMenu,
+      heroDirection: this.state.isMobile ? "column" : "row",
+      heroPad: this.state.isMobile ? "60px 0 40px 0" : "90px 0",
+      logoColWidth: this.state.isMobile ? "100%" : "230px",
+      logoMaxWidth: this.state.isMobile ? "220px" : "none",
+      heroTextAlign: this.state.isMobile ? "center" : "left",
+      heroBtnAlign: this.state.isMobile ? "center" : "flex-start",
+      heroLogoPadBottom: this.state.isMobile ? "40px" : "90px",
+      langOptions,
+      hasChatLog: chatLog.length > 0,
+      chatLog,
+      chatOpen: this.state.chatOpen,
+      chatInput: this.state.chatInput,
+      onChatInput: this.onChatInput,
+      toggleChat: this.toggleChat,
+      sendChat: this.sendChat,
+      onQuick1: () => this.quickChat(t.chatQ1, "chatA1"),
+      onQuick2: () => this.quickChat(t.chatQ2, "chatA2"),
+      onQuick3: () => this.quickChat(t.chatQ3, "chatA3"),
+      onQuick4: () => this.quickChat(t.chatQ4, "chatA4"),
+      onChatKeyDown: (e) => { if (e.key === "Enter") this.sendChat(); }
+    };
+  }
+}</script>
+</body>
+</html>
